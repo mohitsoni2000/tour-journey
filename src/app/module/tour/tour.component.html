@@ -1,0 +1,62 @@
+<app-header></app-header>
+<main>
+    <app-breadcrumbs></app-breadcrumbs>
+    <app-tour-package></app-tour-package>
+    <section class="tour-list-section section-padding2" [@fadeIn]>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-xl-12">
+                    <div class="all-tour-list">
+                        <div class="row g-4">
+                            @defer (on viewport; prefetch on viewport) {
+                            @if (toursWithBanner$ | async; as items) {
+                            @for (item of items; track $index) {
+                            @if (item.type === 'tour') {
+                            <div class="col-xl-4 col-lg-4 col-sm-6" [@cardAnimation]="'in'"
+                                [style.animation-delay]="$index * 0.1 + 's'">
+                                <app-tour-card [tour]="item.data" [phoneNumber]="userDeatils.phone" (enquiryModalVisibleChange)="openEnquiryModal()" />
+                            </div>
+                            } @else {
+                            <div class="col-12 my-4" [@bannerAnimation]>
+                                <app-banner [banner]="item.data" />
+                            </div>
+                            }
+                            }
+                            }
+                            } @placeholder {
+                            <div class="row">
+                                @for (_ of [1,2,3]; track $index) {
+                                <div class="col-xl-4 col-lg-4 col-sm-6">
+                                    <app-tour-card-skeleton />
+                                </div>
+                                }
+                            </div>
+                            } @loading (minimum 1s) {
+                            @for (_ of [1,2,3,4,5,6]; track $index) {
+                            <div class="col-xl-4 col-lg-4 col-sm-6">
+                                <app-tour-card-skeleton />
+                            </div>
+                            }
+                            } @error {
+                            <div class="error-message">
+                                Failed to load tours. Please try again later.
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- FAQ Section -->
+    <app-faq></app-faq>
+
+    <!-- Review Section -->
+    <app-review></app-review>
+
+    <!-- Fixed Buttons -->
+    <app-whatsapp-button [phoneNumber]="userDeatils.whatsapp"></app-whatsapp-button>
+    <app-call-button [phoneNumber]="userDeatils.phone" (callRequested)="handleCallRequest()"></app-call-button>
+</main>
+<app-footer></app-footer>
+<app-enquiry-modal #enquiryModal></app-enquiry-modal>

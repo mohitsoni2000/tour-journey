@@ -1,0 +1,12 @@
+@if (isMobile) {
+<div class="mobile-buttons" [@buttonContainer]>
+  <a [href]="'tel:' + phoneNumber" class="call-now-button" [@buttonAnimation]="'in'" [class.pulse]="isCallNowPulsing">
+    <i class="ri-phone-line"></i>
+  </a>
+
+  <button class="callback-button" (click)="onCallRequest()" [@buttonAnimation]="'in'" [class.pulse]="isCallbackPulsing">
+    <i class="ri-customer-service-line"></i>
+    <span>Request Callback</span>
+  </button>
+</div>
+}

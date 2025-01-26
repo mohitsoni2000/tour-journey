@@ -1,0 +1,88 @@
+<!-- tour-card.component.html -->
+<div class="package-card animate__animated animate__fadeInUp">
+    <div class="package-img">
+        <swiper-container #swiperContainer init="false">
+            @for (image of tour.images; track $index) {
+            <swiper-slide>
+                <img [src]="image" [alt]="tour.title" class="tour-image" loading="lazy" />
+            </swiper-slide>
+            }
+            <div class="swiper-pagination glass-effect"></div>
+            <div class="swiper-button-prev glass-effect"></div>
+            <div class="swiper-button-next glass-effect"></div>
+        </swiper-container>
+
+        @if (tour.isFeatured) {
+        <div class="image-badge glass-effect" @fadeIn>
+            <i class="ri-award-fill"></i>
+            <span>Featured</span>
+        </div>
+        }
+    </div>
+
+    <div class="package-content glass-effect">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="duration-badge" @slideIn>
+                <i class="ri-time-line"></i>
+                <span>{{tour.duration}}</span>
+            </div>
+
+            <div class="info-section" @fadeIn>
+                <button class="info-btn" (mouseenter)="showTooltip()" (mouseleave)="hideTooltip()">
+                    <i class="ri-information-line"></i>
+                </button>
+                @if (tooltipVisible) {
+                <div class="info-tooltip glass-effect" @tooltip>
+                    <ul>
+                        @for (highlight of tour.highlights; track highlight) {
+                        <li><i class="ri-check-line"></i>{{highlight}}</li>
+                        }
+                    </ul>
+                </div>
+                }
+            </div>
+        </div>
+
+        <h3 class="area-name" @fadeIn>{{tour.title}}</h3>
+        <div class="location" @fadeIn>
+            <i class="ri-map-pin-line"></i>
+            <span>{{tour.location}}</span>
+        </div>
+
+        <div class="cities-scroll mb-2" @fadeIn>
+            <div class="cities-content">
+                @for (city of tour.cities; track city) {
+                <span class="city-tag">
+                    <i class="ri-building-line"></i>
+                    {{city}}
+                </span>
+                }
+            </div>
+        </div>
+
+        <div class="price-section glass-effect" @scaleIn>
+            <div class="price-block">
+                <div>
+                    <div class="discounted-price">
+                        <span class="currency">₹</span>{{discountedPrice | number}}
+                    </div>
+                    <div class="original-price">
+                        <span class="currency">₹</span>{{tour.price | number}}
+                    </div>
+                </div>
+                <div class="savings">
+                    <span class="save-tag">Save ₹{{savingsAmount | number}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons" @slideIn>
+            <a class="call-btn glass-effect" [href]="'tel:' + phoneNumber">
+                <i class="ri-phone-line"></i>
+            </a>
+            <button class="request-btn glass-effect" (click)="openEnquiryModal()">
+                Request Callback
+            </button>
+        </div>
+    </div>
+</div>

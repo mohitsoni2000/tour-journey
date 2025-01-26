@@ -1,0 +1,87 @@
+.skeleton-animate {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-img {
+  height: 200px;
+  border-radius: 8px 8px 0 0;
+}
+
+.skeleton-badge {
+  width: 80px;
+  height: 24px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.skeleton-rating {
+  width: 60px;
+  height: 24px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.skeleton-duration {
+  width: 120px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-title {
+  width: 80%;
+  height: 24px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-city {
+  width: 80px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-location {
+  width: 150px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-info {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+}
+
+.skeleton-price {
+  width: 60%;
+  height: 32px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+}
+
+.skeleton-button {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

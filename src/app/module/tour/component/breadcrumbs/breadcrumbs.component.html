@@ -1,0 +1,81 @@
+<!-- tour-package-slider.component.html -->
+<section class="tour-package-slider">
+    <swiper-container #swiperContainer init="false">
+        @for(package of packages; track package.id) {
+        <swiper-slide>
+            <div class="slide-wrapper" [style.background-image]="'url(' + package.imageUrl + ')'">
+                <div class="overlay"></div>
+                <div class="slide-content">
+                    <div class="content-wrapper">
+                        <div class="duration-badge">
+                            <i class="ri-time-line"></i>
+                            {{ package.duration }}
+                        </div>
+
+                        <h1 class="slide-title">
+                            {{ package.title }}
+                        </h1>
+
+                        <div class="location-wrapper">
+                            <i class="ri-map-pin-line"></i>
+                            {{ package.location }}
+                        </div>
+
+                        <div class="highlights-wrapper">
+                            @for(highlight of package.highlights; track highlight) {
+                            <div class="highlight-tag">
+                                <i class="ri-checkbox-circle-fill"></i>
+                                {{ highlight }}
+                            </div>
+                            }
+                        </div>
+
+                        <div class="savings-banner">
+                            <i class="ri-price-tag-3-line"></i>
+                            Save upto 20% on Dubai Tour Packages
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </swiper-slide>
+        }
+    </swiper-container>
+
+    <div class="query-form-wrapper">
+        <div class="glass-form">
+            <div class="form-header">
+                <i class="ri-customer-service-2-line"></i>
+                <h3>Get a Callback</h3>
+                <p>Talk to our experts to get the best advice and options for your holiday</p>
+            </div>
+
+            <form [formGroup]="queryForm" (ngSubmit)="onSubmit()">
+                <div class="form-field">
+                    <i class="ri-user-line"></i>
+                    <input type="text" formControlName="name" placeholder="Your Name"
+                        [class.invalid]="queryForm.get('name')?.invalid && queryForm.get('name')?.touched">
+                </div>
+
+                <div class="form-field">
+                    <i class="ri-mail-line"></i>
+                    <input type="email" formControlName="email" placeholder="Email"
+                        [class.invalid]="queryForm.get('email')?.invalid && queryForm.get('email')?.touched">
+                </div>
+
+                <div class="form-field">
+                    <i class="ri-phone-line"></i>
+                    <input type="tel" formControlName="phone" placeholder="Contact Number"
+                        [class.invalid]="queryForm.get('phone')?.invalid && queryForm.get('phone')?.touched">
+                </div>
+                <div class="action-buttons">
+                    <a href="tel:{{userDeatils.phone}}" class="call-btn" >
+                        <i class="ri-phone-line"></i>
+                    </a>
+                    <button type="submit" [disabled]="queryForm.invalid">
+                        Get a Callback
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

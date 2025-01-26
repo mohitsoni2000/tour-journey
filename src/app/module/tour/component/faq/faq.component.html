@@ -1,0 +1,34 @@
+<section class="faq-section py-5" [@fadeIn]>
+    <div class="container">
+        <h2 class="text-center mb-5 section-title">Frequently Asked Questions</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="faq-container" [@listAnimation]="faqs.length">
+                    @if (isLoading) {
+                    @for (item of [1,2,3]; track item) {
+                    <div class="faq-item mb-3 skeleton-item">
+                        <div class="faq-header skeleton">
+                            <div class="skeleton-question"></div>
+                            <div class="skeleton-icon"></div>
+                        </div>
+                    </div>
+                    }
+                    } @else {
+                    @for (faq of faqs; track faq.question) {
+                    <div class="faq-item mb-3" [class.active]="faq.isOpen"
+                        [@expansionAnimation]="faq.isOpen ? 'expanded' : 'collapsed'">
+                        <div class="faq-header" (click)="toggleFAQ(faq)" [@pulseAnimation]="'active'">
+                            <h3 class="faq-question">{{ faq.question }}</h3>
+                            <i class="ri-add-line" [@rotateAnimation]="faq.isOpen ? 'rotated' : 'default'"></i>
+                        </div>
+                        <div class="faq-answer-container" [@slideContent]="faq.isOpen ? 'expanded' : 'collapsed'">
+                            <div class="faq-answer">{{ faq.answer }}</div>
+                        </div>
+                    </div>
+                    }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

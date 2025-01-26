@@ -1,0 +1,119 @@
+<!-- review.component.html -->
+<div class="review-container">
+    <!-- Business Details Section -->
+    <div *ngIf="businessDetails" class="glass-card business-header animate-fade-in">
+        <h1 class="business-title">{{businessDetails.name}}</h1>
+        <p class="business-address">{{businessDetails.address}}</p>
+
+        <div class="rating-overview">
+            <div class="rating-main">
+                <span class="rating-number">{{businessDetails.rating | number:'1.1-1'}}</span>
+                <div class="stars-container">
+                    <ng-container *ngFor="let star of [1,2,3,4,5]">
+                        <i [class]="getStarClass(star, businessDetails.rating)" class="star"></i>
+                    </ng-container>
+                </div>
+                <span class="review-count">{{businessDetails.totalReviews}} reviews</span>
+            </div>
+        </div>
+
+        <!-- Popular Mentions -->
+        <div *ngIf="ratingSummary?.popularMentions?.length" class="mentions-section">
+            <h2>People often mention</h2>
+            <div class="mentions-container">
+                <span *ngFor="let mention of ratingSummary?.popularMentions" class="mention-tag hover-lift">
+                    {{mention.tag}} ({{mention.count}})
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Summary -->
+    <div *ngIf="ratingSummary" class=" rating-summary-container  glass-card stats-container animate-scale-in">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value  primary-color">{{ratingSummary.averageRating | number:'1.1-1'}}</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ratingSummary.totalReviews}}</div>
+                <div class="stat-label">Total Reviews</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ratingSummary.countryCount}}</div>
+                <div class="stat-label">Countries</div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution -->
+        <!-- <div class="rating-bar-container">
+            <div *ngFor="let rating of [5,4,3,2,1]" class="rating-bar">
+                <span class="rating-number">{{rating}}</span>
+                <div class="bar-wrapper">
+                    <div class="bar-fill" [class.high]="rating >= 4" [class.medium]="rating === 3"
+                        [class.low]="rating < 3" [style.width.%]="getRatingPercentage(rating)">
+                    </div>
+                </div>
+                <span class="rating-count">
+                    {{ratingSummary.ratingDistribution[rating] || 0}}
+                </span>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Sort Controls -->
+    <!-- <div class="sort-controls">
+        <button *ngFor="let option of sortOptions" (click)="updateSort(option.value)" class="sort-button"
+            [class.active]="currentSort === option.value">
+            {{option.label}}
+        </button>
+    </div> -->
+
+    <!-- Reviews List -->
+    <div class="reviews-list mt-4">
+        <div *ngFor="let review of reviews" class="review-card glass-card animate-slide-in">
+            <div class="review-header">
+                <div class="user-info">
+                    <div class="avatar">
+                        <img *ngIf="review.profilePhoto" [src]="review.profilePhoto" [alt]="review.userName">
+                        <span *ngIf="!review.profilePhoto">
+                            {{review.userName[0]}}
+                        </span>
+                    </div>
+                    <div class="user-details">
+                        <h3>{{review.userName}}</h3>
+                        <span class="review-date">{{review.displayDate}}</span>
+                    </div>
+                </div>
+                <div class="rating-badge">
+                    {{review.rating}}/5
+                </div>
+            </div>
+
+            <div class="review-content" [@expandCollapse]="review.isExpanded ? 'expanded' : 'collapsed'">
+                <p [class.truncated]="!review.isExpanded">
+                    {{review.content}}
+                </p>
+                <!-- <button *ngIf="review.content.length > 300" (click)="toggleReview(review)" class="read-more-button">
+                    {{review.isExpanded ? 'Show less' : 'Read more'}}
+                </button> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-spinner"></div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-message">
+        {{error}}
+    </div>
+
+    <!-- Pagination -->
+    <!-- <div *ngIf="reviews.length" class="pagination">
+        <button *ngFor="let page of getPageNumbers()" (click)="changePage(page)" class="page-button"
+            [class.active]="currentPage === page">
+            {{page}}
+        </button>
+    </div> -->
+</div>

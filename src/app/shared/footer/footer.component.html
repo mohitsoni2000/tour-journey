@@ -1,0 +1,93 @@
+<!-- footer.component.html -->
+<footer class="footer-section">
+    <div class="container">
+        <!-- Main Footer Sections -->
+        <div class="footer-main-section  animate-on-scroll" @fadeInUp>
+            <img src="assets/images/logo/logo.png"  loading="lazy" alt="Vinay Ashija Logo" class="footer-logo">
+            <div class="footer-grid">
+                <div *ngFor="let section of footerSections" class="footer-column">
+                    <h3 class="footer-top-title">{{ section.title }}</h3>
+                    <ul class="footer-links">
+                        <li *ngFor="let link of section.links">
+                            <a [href]="link.url" [class.warning-link]="link.isHighlighted">
+                                {{ link.text }}
+                                <i *ngIf="link.isHighlighted" class="fas fa-exclamation-triangle warning-icon"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Destinations Grid -->
+        <div class="destinations-section animate-on-scroll" @fadeInUp>
+            <h3 class="footer-title">TRAVEL DESTINATIONS</h3>
+            <div class="destinations-grid">
+                <!-- Skeleton Loading -->
+                <ng-container *ngIf="isLoading">
+                    <div *ngFor="let i of [1,2,3,4,5,6]" class="destination-card skeleton">
+                        <div class="card-image skeleton-image"></div>
+                        <div class="skeleton-text"></div>
+                    </div>
+                </ng-container>
+
+                <!-- Actual Content -->
+                <ng-container *ngIf="!isLoading">
+                    <a *ngFor="let dest of destinations" [href]="dest.url"
+                        class="destination-card animate__animated animate__fadeIn">
+                        <div class="card-image">
+                            <img [src]="dest.imageUrl" loading="lazy" [alt]="dest.name">
+                            <div class="overlay">
+                                <span class="overlay-text">{{ dest.overlayText }}</span>
+                            </div>
+                        </div>
+                        <h4 class="destination-name">{{ dest.name }}</h4>
+                    </a>
+                </ng-container>
+            </div>
+        </div>
+
+        <!-- Popular Activities -->
+        <!-- <div class="activities-section animate-on-scroll" @fadeInUp>
+            <h3 class="footer-title">POPULAR ACTIVITIES</h3>
+            <div class="tags-container">
+                <a *ngFor="let activity of popularActivities" href="javascript:void(0)"
+                    class="tag animate__animated animate__fadeIn">
+                    {{ activity }}
+                </a>
+            </div>
+        </div> -->
+
+        <!-- International Destinations -->
+        <!-- <div class="international-section animate-on-scroll" @fadeInUp>
+            <h3 class="footer-title">INTERNATIONAL DESTINATIONS</h3>
+            <div class="tags-container">
+                <a *ngFor="let destination of internationalDestinations" href="javascript:void(0)"
+                    class="tag animate__animated animate__fadeIn">
+                    {{ destination }}
+                </a>
+            </div>
+        </div> -->
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom animate-on-scroll" @fadeInUp>
+            <div class="social-icons">
+                <a *ngFor="let social of socialLinks" [href]="social.url" [attr.aria-label]="social.label"
+                    class="social-icon">
+                    <i [class]="social.icon"></i>
+                </a>
+            </div>
+            <div class="copyright">
+                <p>&copy; {{ currentYear }} {{userDeatils.name}} All rights reserved.</p>
+                <p>Developer: Vinay Ashija (+91 94165 09833), Mohit Soni (+91 89296 36027) </p>
+                <p class="disclaimer">
+                    The content and images used on this site are copyright protected and copyrights vests with the
+                    respective owners.
+                    The usage of the content and images on this website is intended to promote the works and no
+                    endorsement of the
+                    artist shall be implied. Unauthorized use is prohibited and punishable by law.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

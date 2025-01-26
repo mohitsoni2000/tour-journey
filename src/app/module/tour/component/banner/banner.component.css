@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+.promotion-banner {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding: 2rem;
+}
+
+.banner-content {
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.banner-content,
+h2,
+p {
+  color: white;
+}
+
+.promotion-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+}
+
+
+
+@media (max-width: 768px) {
+  .promotion-banner {
+    min-height: 160px;
+    padding: 1.5rem;
+  }
+}

@@ -1,0 +1,12 @@
+<div class="whatsapp-container" [@buttonContainer]="'in'" (mouseenter)="showTooltip = true"
+  (mouseleave)="showTooltip = false">
+  <a [href]="'https://wa.me/' + phoneNumber" class="whatsapp-button" target="_blank"
+    [@pulseAnimation]="isPulsing ? 'pulse' : 'noPulse'" [@scaleHover]="isHovered ? 'hovered' : 'default'"
+    (mouseenter)="onHover(true)" (mouseleave)="onHover(false)">
+    <i class="ri-whatsapp-line" [@iconAnimation]="isHovered ? 'hovered' : 'default'"></i>
+  </a>
+
+  <div class="whatsapp-tooltip" *ngIf="showTooltip" [@tooltipAnimation]>
+    Chat with us on WhatsApp
+  </div>
+</div>

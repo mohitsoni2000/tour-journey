@@ -1,0 +1,108 @@
+<!-- header.component.html -->
+<div class="announcement-strip">
+    <div class="text-container">
+        <div class="announcement-text">
+            Pickyourtrail won India's Best International Holiday Brand!
+        </div>
+    </div>
+</div>
+
+<header class="header-container" [class.sticky]="isSticky">
+    <div class="header-content">
+        <a [routerLink]="['/']" routerLinkActive="router-link-active" class="logo">
+            <img src="assets/images/logo/logo.png" alt="Journey Bees">
+        </a>
+
+        <button class="search-button" [class.sticky]="isSticky" (click)="toggleSearchForm()">
+            <span class="search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
+            <span class="search-content">
+                Search for
+                <span class="destination-wrapper">
+                    <span class="destination" [class.animate-in]="isAnimatingIn" [class.animate-out]="isAnimatingOut">
+                        {{currentCity}}
+                    </span>
+                </span>
+            </span>
+        </button>
+
+        <div class="right-section">
+            <div class="contact-info">
+                <a href="mailto:{{userDeatils.email}}">{{userDeatils.email}}</a>
+            </div>
+            <div class="contact-info">
+                <a href="tel:{{userDeatils.phone}}">{{userDeatils.phone}}</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Search Form Overlay -->
+<div class="search-overlay" *ngIf="isSearchFormOpen" [@expandSearch] (click)="closeSearchForm()">
+    <div class="search-form-wrapper" (click)="$event.stopPropagation()">
+        <div class="search-form-header">
+            <h2>Search Your Perfect Holiday</h2>
+            <button class="close-button" (click)="closeSearchForm()">×</button>
+        </div>
+
+        <form (ngSubmit)="onSearchSubmit()" class="search-form">
+            <!-- Main Search Input -->
+            <div class="form-group search-input-group">
+                <input type="text" [(ngModel)]="searchModel.searchTerm" name="searchTerm"
+                    placeholder="Where do you want to go?" class="search-input" #searchInput>
+            </div>
+
+            <!-- Product Type -->
+            <div class="form-group">
+                <label>Product Type</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="productType" [(ngModel)]="searchModel.productType" value="tour">
+                        Tour
+                    </label>
+                    <label>
+                        <input type="radio" name="productType" [(ngModel)]="searchModel.productType" value="activity">
+                        Activity
+                    </label>
+                </div>
+            </div>
+
+            <!-- Trip Duration -->
+            <div class="form-group">
+                <label>Trip Duration</label>
+                <div class="duration-options">
+                    <button type="button"
+                        *ngFor="let duration of ['Upto 1 Day', '2 to 3 days', '3 to 5 days', '5 to 7 days', '7+ Days']"
+                        [class.active]="searchModel.tripDuration === duration"
+                        (click)="searchModel.tripDuration = duration">
+                        {{ duration }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Price Range -->
+            <div class="form-group">
+                <label>Price Range</label>
+                <div class="price-range">
+                    <input type="number" [(ngModel)]="searchModel.priceRange.min" name="minPrice" placeholder="Min">
+                    <span>to</span>
+                    <input type="number" [(ngModel)]="searchModel.priceRange.max" name="maxPrice" placeholder="Max">
+                </div>
+            </div>
+
+            <!-- Include Flights -->
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" [(ngModel)]="searchModel.includeFlights" name="includeFlights">
+                    I want Flights to be included
+                </label>
+            </div>
+
+            <button type="submit" class="search-submit-btn">Search For Products</button>
+        </form>
+    </div>
+</div>
