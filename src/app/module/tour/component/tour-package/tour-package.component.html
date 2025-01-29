@@ -17,8 +17,8 @@
   <!-- Actual content -->
   <div class="content" *ngIf="!isLoading && !error && location">
     <h2>{{ location.name }}</h2>
-    <p>{{ getFirstLine(location.content) }}</p>
-    <button class="cta-button" (click)="openModal()">Read More</button>
+    <p>{{ getFirstLine(location.content) }} <a href="javascript:void(0)" (click)="openModal()">Read more</a> </p>
+    <!-- <button class="cta-button" (click)="openModal()">Read More</button> -->
   </div>
 </div>
 

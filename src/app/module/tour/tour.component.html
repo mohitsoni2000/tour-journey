@@ -1,8 +1,8 @@
-<app-header></app-header>
+<app-header (enquiryModalVisibleChange)="openEnquiryModal()"></app-header>
 <main>
-    <app-breadcrumbs></app-breadcrumbs>
+    <app-breadcrumbs  [packages]="(sliderTours$ | async) || []"></app-breadcrumbs>
     <app-tour-package></app-tour-package>
-    <section class="tour-list-section section-padding2" [@fadeIn]>
+    <section class="tour-list-section section-padding2 pt-0" [@fadeIn]>
         <div class="container">
             <div class="row g-4">
                 <div class="col-xl-12">

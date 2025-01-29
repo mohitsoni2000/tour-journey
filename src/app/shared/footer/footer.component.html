@@ -2,8 +2,8 @@
 <footer class="footer-section">
     <div class="container">
         <!-- Main Footer Sections -->
-        <div class="footer-main-section  animate-on-scroll" @fadeInUp>
-            <img src="assets/images/logo/logo.png"  loading="lazy" alt="Vinay Ashija Logo" class="footer-logo">
+        <!-- <div class="footer-main-section  animate-on-scroll" @fadeInUp>
+            <img src="assets/images/logo/logo.png" loading="lazy" alt="Vinay Ashija Logo" class="footer-logo">
             <div class="footer-grid">
                 <div *ngFor="let section of footerSections" class="footer-column">
                     <h3 class="footer-top-title">{{ section.title }}</h3>
@@ -17,7 +17,65 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> -->
+
+        <div class="footer-main-section">
+            <!-- DO YOU NEED HELP? Section -->
+            <div class="footer-column">
+              <h3 class="footer-title">DO YOU NEED HELP?</h3>
+              <div class="contact-info">
+                <div class="contact-item">
+                  <span class="label">Call us:</span>
+                  <a href="tel:{{userDeatils.phone}}" class="contact-link">{{userDeatils.phone}}</a>
+                </div>
+                <div class="contact-item">
+                  <span class="label">E-Mail for us</span>
+                  <a href="mailto:{{userDeatils.email}}" class="contact-link">{{userDeatils.email}}</a>
+                </div>
+                <div class="contact-item">
+                  <span class="label">Follow us</span>
+                  <div class="social-links" *ngFor="let link of socialLinks">
+                    <a [href]="link.url" [attr.aria-label]="link.label" class="social-link"><i [class]="link.icon"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- COMPANY Section -->
+            <div class="footer-column">
+              <h3 class="footer-title">COMPANY</h3>
+              <ul class="footer-links">
+                <li><a href="https://journeybees.in/page/about-us">About us</a></li>
+              </ul>
+              <div class="payment-methods">
+                <img src="path-to-paypal-image.png" alt="PayPal" class="payment-icon">
+                <img src="path-to-payumoney-image.png" alt="PayUMoney" class="payment-icon">
+              </div>
+            </div>
+          
+            <!-- SUPPORT Section -->
+            <div class="footer-column">
+              <h3 class="footer-title">SUPPORT</h3>
+              <ul class="footer-links">
+                <li><a href="https://journeybees.in/page/terms-and-conditions">Terms and Conditions</a></li>
+                <li><a href="https://journeybees.in/contact">Contact us</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+              </ul>
+            </div>
+          
+            <!-- MEMBERSHIPS & PARTNER Section -->
+            <div class="footer-column">
+              <h3 class="footer-title">MEMBERSHIPS & PARTNER</h3>
+              <div class="partner-logos">
+                <!-- Add your partner logos here -->
+                <img src="path-to-ministry-logo.png" alt="Ministry of Tourism" class="partner-logo">
+                <img src="path-to-iato-logo.png" alt="IATO" class="partner-logo">
+                <img src="path-to-itb-logo.png" alt="ITB Berlin" class="partner-logo">
+                <img src="path-to-ttf-logo.png" alt="TTF" class="partner-logo">
+                <img src="path-to-tripadvisor-logo.png" alt="TripAdvisor" class="partner-logo">
+              </div>
+            </div>
+          </div>
 
         <!-- Destinations Grid -->
         <div class="destinations-section animate-on-scroll" @fadeInUp>
@@ -33,7 +91,7 @@
 
                 <!-- Actual Content -->
                 <ng-container *ngIf="!isLoading">
-                    <a *ngFor="let dest of destinations" [href]="dest.url"
+                    <a *ngFor="let dest of destinations" [routerLink]="'/tour' + dest.url"
                         class="destination-card animate__animated animate__fadeIn">
                         <div class="card-image">
                             <img [src]="dest.imageUrl" loading="lazy" [alt]="dest.name">

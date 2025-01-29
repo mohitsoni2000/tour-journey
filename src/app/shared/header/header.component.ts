@@ -6,7 +6,8 @@ import {
   HostListener,
   OnInit,
   OnDestroy,
-  AfterViewInit,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import {
   UserDetails,
 } from '../../service/common/common.service';
 import { RouterModule } from '@angular/router';
+import { HeaderService } from '../../service/header/header.service';
 
 interface SearchModel {
   searchTerm: string;
@@ -67,12 +69,12 @@ interface SearchModel {
     ]),
   ],
 })
-export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isSticky = false;
   isSearchFormOpen = false;
   showAnnouncement = true;
   searchDestination = 'Dubai';
-
+  @Output() enquiryModalVisibleChange = new EventEmitter<boolean>();
   cities: string[] = [
     'Dubai',
     'Paris',
@@ -102,18 +104,47 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   @ViewChild('searchInput') searchInput!: ElementRef;
-
+  announcementText: string = '';
   userDeatils: UserDetails;
 
-  constructor(private commonService: CommonService) {
+  constructor(
+    private commonService: CommonService,
+    private headerService: HeaderService
+  ) {
     this.userDeatils = this.commonService.getUserDetails();
   }
 
   ngOnInit(): void {
     this.startCityAnimation();
+    this.fetchHeaderSettings();
   }
 
-  ngAfterViewInit(): void {}
+  private fetchHeaderSettings(): void {
+    this.headerService.fetchHeaderSettings().subscribe({
+      next: (response) => {
+        if (response.success) {
+          const headerData = response.data.find(
+            (item) => item.name === 'site_header'
+          );
+          const emailData = response.data.find(
+            (item) => item.name === 'admin_email'
+          );
+
+          if (headerData) {
+            this.announcementText = headerData.val;
+          }
+          if (emailData) {
+            this.userDeatils.email = emailData.val;
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching announcement:', error);
+        this.announcementText =
+          "Journey bees won India's Best International Holiday Brand!"; // fallback
+      },
+    });
+  }
 
   ngOnDestroy(): void {
     if (this.cityInterval) {
@@ -135,15 +166,16 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   toggleSearchForm(): void {
-    this.isSearchFormOpen = !this.isSearchFormOpen;
-    if (this.isSearchFormOpen) {
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => {
-        this.searchInput?.nativeElement?.focus();
-      }, 300);
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+    this.enquiryModalVisibleChange.emit();
+    // this.isSearchFormOpen = !this.isSearchFormOpen;
+    // if (this.isSearchFormOpen) {
+    //   document.body.style.overflow = 'hidden';
+    //   setTimeout(() => {
+    //     this.searchInput?.nativeElement?.focus();
+    //   }, 300);
+    // } else {
+    //   document.body.style.overflow = 'auto';
+    // }
   }
 
   closeSearchForm(): void {

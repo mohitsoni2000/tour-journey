@@ -12,10 +12,10 @@
             <div class="swiper-button-next glass-effect"></div>
         </swiper-container>
 
-        @if (tour.isFeatured) {
+        @if (tour.featured) {
         <div class="image-badge glass-effect" @fadeIn>
             <i class="ri-award-fill"></i>
-            <span>Featured</span>
+            <span>{{tour.featured}}</span>
         </div>
         }
     </div>
@@ -26,21 +26,6 @@
                 <i class="ri-time-line"></i>
                 <span>{{tour.duration}}</span>
             </div>
-
-            <div class="info-section" @fadeIn>
-                <button class="info-btn" (mouseenter)="showTooltip()" (mouseleave)="hideTooltip()">
-                    <i class="ri-information-line"></i>
-                </button>
-                @if (tooltipVisible) {
-                <div class="info-tooltip glass-effect" @tooltip>
-                    <ul>
-                        @for (highlight of tour.highlights; track highlight) {
-                        <li><i class="ri-check-line"></i>{{highlight}}</li>
-                        }
-                    </ul>
-                </div>
-                }
-            </div>
         </div>
 
         <h3 class="area-name" @fadeIn>{{tour.title}}</h3>
@@ -49,14 +34,16 @@
             <span>{{tour.location}}</span>
         </div>
 
-        <div class="cities-scroll mb-2" @fadeIn>
-            <div class="cities-content">
-                @for (city of tour.cities; track city) {
-                <span class="city-tag">
-                    <i class="ri-building-line"></i>
-                    {{city}}
-                </span>
-                }
+        <div class="cities-wrapper mb-2" @fadeIn>
+            <div class="cities-scroll" [class.scrollable]="isScrollable" #citiesScroll>
+                <div class="cities-content" #citiesContent>
+                    @for (city of tour.cities; track city) {
+                    <span class="city-tag">
+                        <i class="ri-building-line"></i>
+                        {{city}}
+                    </span>
+                    }
+                </div>
             </div>
         </div>
 
@@ -68,10 +55,13 @@
                     </div>
                     <div class="original-price">
                         <span class="currency">₹</span>{{tour.price | number}}
+                        <span class="save-tag">Save ₹{{savingsAmount | number}}</span>
                     </div>
                 </div>
-                <div class="savings">
-                    <span class="save-tag">Save ₹{{savingsAmount | number}}</span>
+                <div class="info-container">
+                    <button class="info-btn" #tooltipBtn>
+                        Read More
+                    </button>
                 </div>
             </div>
         </div>

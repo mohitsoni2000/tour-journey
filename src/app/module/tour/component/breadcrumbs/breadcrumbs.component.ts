@@ -23,6 +23,7 @@ import {
   UserDetails,
 } from '../../../../service/common/common.service';
 import { QueryService } from '../../../../service/query/query.service';
+import { SliderTour } from '../../../../service/tour/tour.service';
 
 // Register Swiper custom elements
 register();
@@ -60,47 +61,7 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     'Umm Al Quwain',
   ];
 
-  @Input() packages: TourPackage[] = [
-    {
-      id: 1,
-      title: 'Explore the Wonders of Dubai',
-      description:
-        'Experience the magic of Dubai with our carefully curated tour package',
-      imageUrl: 'assets/images/package/package-8.webp',
-      location: 'Dubai',
-      duration: '5 days & 4 nights',
-      highlights: [
-        'Burj Khalifa Visit',
-        'Desert Safari',
-        'Dubai Mall Shopping',
-        'Dubai Frame',
-      ],
-    },
-    {
-      id: 2,
-      title: 'Dubai Uncovered',
-      description:
-        'Discover hidden gems of Dubai with our exclusive tour package',
-      imageUrl: 'assets/images/package/package-2.webp',
-      location: 'Dubai',
-      duration: '5 days & 4 nights',
-      highlights: [
-        'Miracle Garden',
-        'Global Village',
-        'Dubai Marina',
-        'Palm Jumeirah',
-      ],
-    },
-    {
-      id: 3,
-      title: 'Desert Delights and City Lights',
-      description: 'The perfect blend of adventure and luxury in Dubai',
-      imageUrl: 'assets/images/package/package-3.webp',
-      location: 'Dubai',
-      duration: '5 days & 4 nights',
-      highlights: ['Dune Bashing', 'Dhow Cruise', 'Gold Souk', 'Burj Al Arab'],
-    },
-  ];
+  @Input() packages: SliderTour[] = [];
 
   userDeatils: UserDetails;
 

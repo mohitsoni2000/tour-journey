@@ -2,14 +2,14 @@
 <div class="announcement-strip">
     <div class="text-container">
         <div class="announcement-text">
-            Pickyourtrail won India's Best International Holiday Brand!
+            {{announcementText}}
         </div>
     </div>
 </div>
 
 <header class="header-container" [class.sticky]="isSticky">
     <div class="header-content">
-        <a [routerLink]="['/']" routerLinkActive="router-link-active" class="logo">
+        <a href="javascript:void(0)" class="logo">
             <img src="assets/images/logo/logo.png" alt="Journey Bees">
         </a>
 
@@ -32,10 +32,16 @@
 
         <div class="right-section">
             <div class="contact-info">
-                <a href="mailto:{{userDeatils.email}}">{{userDeatils.email}}</a>
+                <a href="mailto:{{userDeatils.email}}">
+                    <i class="ri-mail-line"></i>
+                    {{userDeatils.email}}
+                </a>
             </div>
             <div class="contact-info">
-                <a href="tel:{{userDeatils.phone}}">{{userDeatils.phone}}</a>
+                <a href="tel:{{userDeatils.phone}}">
+                    <i class="ri-phone-line"></i>
+                    {{userDeatils.phone}}
+                </a>
             </div>
         </div>
     </div>

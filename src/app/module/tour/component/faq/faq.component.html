@@ -1,4 +1,4 @@
-<section class="faq-section py-5" [@fadeIn]>
+<section class="faq-section py-5" [@fadeIn] *ngIf="!isLoading && faqs.length">
     <div class="container">
         <h2 class="text-center mb-5 section-title">Frequently Asked Questions</h2>
         <div class="row justify-content-center">

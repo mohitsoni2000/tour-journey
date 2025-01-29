@@ -17,6 +17,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
 import {
   Banner,
+  SliderTour,
   TourService,
   TransformedTour,
 } from '../../service/tour/tour.service';
@@ -77,6 +78,7 @@ export class TourComponent {
   private route = inject(ActivatedRoute);
   toursWithBanner$!: Observable<Array<{ type: 'tour' | 'banner'; data: any }>>;
   userDeatils: UserDetails;
+  sliderTours$: Observable<SliderTour[]> | undefined;
 
   constructor(
     private meta: Meta,
@@ -91,17 +93,16 @@ export class TourComponent {
     this.updateTitle();
     const tourName = this.route.snapshot.params['name'] || '';
     
-    this.toursWithBanner$ = this.tourService.getTourByName(tourName).pipe(
-      map(response => {
-        const transformedTours = response.data.map(tour => 
-          this.tourService.transformTourData(tour)
-        );
-        return this.insertBanners(transformedTours);
-      }),
-      catchError(error => {
-        this.handleError(error);
-        return of([]);
-      })
+    const tourData$ = this.tourService.getTourByName(tourName);
+
+    // Extract slider tours
+    this.sliderTours$ = tourData$.pipe(
+      map(response => response.sliderTours)
+    );
+
+    // Transform data for tour cards with banners
+    this.toursWithBanner$ = tourData$.pipe(
+      map(response => this.insertBanners(response.tours))
     );
   }
 
@@ -180,40 +181,6 @@ export class TourComponent {
         status: error.status,
       },
     });
-  }
-
-  private combineToursAndBanners(
-    tours$: Observable<TransformedTour[]>,
-    banners$: Observable<Banner[]>
-  ): Observable<
-    Array<{ type: 'tour' | 'banner'; data: TransformedTour | Banner }>
-  > {
-    return tours$.pipe(
-      map((tours) => {
-        const result: Array<{
-          type: 'tour' | 'banner';
-          data: TransformedTour | Banner;
-        }> = [];
-
-        tours.forEach((tour, index) => {
-          result.push({ type: 'tour', data: tour });
-
-          if ((index + 1) % 6 === 0) {
-            result.push({
-              type: 'banner',
-              data: {
-                title: 'Special Offer!',
-                subtitle: 'Get up to 50% off on group bookings',
-                ctaText: 'Book Now',
-                backgroundImage: 'assets/images/package/package-4.webp',
-              },
-            });
-          }
-        });
-
-        return result;
-      })
-    );
   }
 
   openEnquiryModal() {

@@ -7,7 +7,7 @@ import {
   UserDetails,
 } from '../../service/common/common.service';
 import { FooterService } from '../../service/footer/footer.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 
 interface FooterSection {
@@ -34,7 +34,7 @@ interface Destination {
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
   animations: [
