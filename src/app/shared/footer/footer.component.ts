@@ -7,8 +7,13 @@ import {
   UserDetails,
 } from '../../service/common/common.service';
 import { FooterService } from '../../service/footer/footer.service';
-import { ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterModule,
+} from '@angular/router';
+import { filter, finalize } from 'rxjs';
 
 interface FooterSection {
   title: string;
@@ -98,6 +103,7 @@ export class FooterComponent implements OnInit {
   constructor(
     private commonService: CommonService,
     private footerService: FooterService,
+    private router: Router,
     private route: ActivatedRoute
   ) {
     this.userDeatils = this.commonService.getUserDetails();
@@ -157,7 +163,7 @@ export class FooterComponent implements OnInit {
       .map((item) => ({
         name: item.name.toUpperCase(),
         imageUrl: `https://journeybees.in/uploads/${item.file_path}`,
-        url: `/${item.slug}`,
+        url: `${item.slug}`,
         overlayText: `Explore ${item.name}`,
       }))
       .slice(0, 12); // Limit to 6 destinations
@@ -182,5 +188,22 @@ export class FooterComponent implements OnInit {
     );
 
     animatedElements.forEach((el) => observer.observe(el));
+  }
+
+  selectDestination(destination: Destination) {
+    // Navigate to new route
+    this.router
+      .navigate(['/tour', destination.url], {
+        skipLocationChange: false,
+        replaceUrl: false,
+      })
+      .then(() => {
+        // Force route refresh by subscribing to NavigationEnd
+        this.router.events
+          .pipe(filter((event) => event instanceof NavigationEnd))
+          .subscribe(() => {
+            window.scrollTo(0, 0); // Scroll to top after navigation
+          });
+      });
   }
 }

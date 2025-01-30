@@ -1,4 +1,4 @@
-/* tour-card.component.css */
+/* tour-card.component.scss */
 
 /* Base card styles with glassmorphism */
 .package-card {
@@ -14,9 +14,24 @@
   margin-bottom: 20px;
 }
 
+/* White gradient overlay */
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Swiper container */
 swiper-container {
   height: 100%;
   width: 100%;
+  display: block;
 }
 
 .package-card:hover {
@@ -31,11 +46,13 @@ swiper-container {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Image section styles */
 .package-img {
   position: relative;
-  height: 230px;
-  overflow: hidden;
+  height: 250px;
+
+  swiper-container {
+    height: 100%;
+  }
 }
 
 .tour-image {
@@ -96,56 +113,97 @@ swiper-container {
 
 /* Content section */
 .package-content {
-  padding: 12px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.95);
 }
 
+/* Duration and location badge */
 .duration-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  gap: 6px;
+  padding: 4px 12px;
   background: rgba(255, 87, 34, 0.1);
-  color: var(--secondary-color);
   border-radius: 16px;
+  color: var(--secondary-color);
   font-size: 10px;
   font-weight: 500;
 }
 
+.location {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--secondary-color);
+  padding: 4px 12px;
+  background: rgba(255, 87, 34, 0.1);
+  border-radius: 16px;
+}
+
+::ng-deep .highlights-tooltip {
+  width: max-content;
+  .tooltip-inner {
+    background: white;
+    color: #4a5568;
+    padding: 12px;
+    text-align: left;
+  }
+
+  .highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+
+    i {
+      color: #4caf50;
+      font-size: 14px;
+    }
+
+    span {
+      font-size: 12px;
+    }
+  }
+}
+
+/* Tour title styles */
 .area-name {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 6px 0 0px;
   font-size: 16px;
   font-weight: 600;
   color: #2d3436;
-  margin: 7px 0 6px;
   line-height: 1.3;
-  min-height: 42px;
-  max-height: 42px;
 }
 
-.location {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #636e72;
-  font-size: 13px;
-  margin-bottom: 7px;
-}
-
-/* Cities scroll animation */
-.cities-scroll {
+/* Cities styles */
+.cities-container {
   position: relative;
-  width: 100%;
-  overflow: hidden;
+  margin: 8px 0;
 }
 
-.cities-content {
-  display: inline-flex;
+.cities-visible {
+  display: flex;
+  flex-wrap: nowrap;
   gap: 6px;
-  animation: scrollCities 15s linear infinite;
-  white-space: nowrap;
+  overflow: hidden;
+
+  &.truncated {
+    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+  }
 }
 
-.cities-scroll:hover .cities-content {
-  animation-play-state: paused;
+.cities-visible.truncated::after {
+  content: "...";
+  position: absolute;
+  right: 0;
+  background: rgba(245, 246, 250, 0.8);
+  padding: 0 4px;
 }
 
 .city-tag {
@@ -157,29 +215,51 @@ swiper-container {
   border-radius: 10px;
   font-size: 11px;
   color: #636e72;
+  white-space: nowrap;
+}
+
+.cities-tooltip {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cities-tooltip.show {
+  display: flex;
 }
 
 /* Price section */
 .price-section {
-  padding: 8px;
+  padding: 10px;
   border-radius: 10px;
   background: rgba(245, 246, 250, 0.5);
+  margin: 12px 0;
 }
 
 .price-block {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .original-price {
   text-decoration: line-through;
   color: #a4b0be;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .discounted-price {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--secondary-color);
   line-height: 1.2;
@@ -203,107 +283,27 @@ swiper-container {
 }
 
 /* Info button and tooltip */
-.info-section {
+.info-container {
   position: relative;
-  display: flex;
-  justify-content: flex-end;
 }
 
 .info-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 6px;
+  padding: 4px 10px;
   border: none;
-  border-radius: 25px;
-
-  /* Glassmorphism base using theme colors */
-  background: rgba(var(--primary-color-rgb), 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--primary-color-rgb), 0.2);
-  box-shadow: var(--primary-shadow);
-
-  /* Text styles */
-  color: var(--primary-color);
-  font-family: var(--Dm);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-
-  /* Transitions */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-
-  /* Pseudo-element for shine effect */
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      120deg,
-      transparent,
-      rgba(var(--primary-color-rgb), 0.2),
-      transparent
-    );
-    transition: 0.5s;
-  }
-
-  /* Button text wrapper */
-  .btn-text {
-    z-index: 1;
-    position: relative;
-  }
-
-  /* Hover states */
-  &:hover {
-    background: rgba(var(--primary-color-rgb), 0.15);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(var(--primary-color-rgb), 0.15);
-
-    &::before {
-      left: 100%;
-    }
-  }
-
-  /* Active state */
-  &:active {
-    transform: translateY(1px);
-    background: rgba(var(--primary-color-rgb), 0.2);
-    box-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.1);
-  }
-}
-
-.info-tooltip {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 200px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background: rgba(var(--secondary-color-rgb), 0.1);
+  color: var(--secondary-color);
   font-size: 11px;
-  z-index: 20;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.info-tooltip ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.info-tooltip li {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 0;
-  color: #4a5568;
+.info-btn:hover {
+  background: rgba(var(--secondary-color-rgb), 0.15);
 }
 
 /* Action buttons */
@@ -346,14 +346,27 @@ swiper-container {
   box-shadow: 0 4px 12px rgba(255, 87, 34, 0.2);
 }
 
-/* Animations */
-@keyframes scrollCities {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+/* Tooltip styles */
+.tooltip {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  z-index: 1000;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  top: -6px;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  transform: rotate(45deg);
+  box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.06);
 }
 
 /* Responsive styles */
@@ -364,10 +377,6 @@ swiper-container {
 }
 
 @media (max-width: 992px) {
-  .package-img {
-    height: 180px;
-  }
-
   .area-name {
     font-size: 15px;
   }
@@ -378,29 +387,20 @@ swiper-container {
 }
 
 @media (max-width: 768px) {
-  .package-img {
-    height: 160px;
-  }
-
   .package-content {
     padding: 14px;
   }
 
   .price-section {
     padding: 10px;
-    margin: 14px 0;
   }
 
-  .info-tooltip {
+  .cities-tooltip {
     width: 180px;
   }
 }
 
 @media (max-width: 576px) {
-  .package-img {
-    height: 140px;
-  }
-
   .image-badge {
     padding: 4px 10px;
     font-size: 11px;
@@ -408,11 +408,6 @@ swiper-container {
 
   .area-name {
     font-size: 14px;
-  }
-
-  .price-block {
-    flex-direction: column;
-    gap: 6px;
   }
 
   .call-btn {
@@ -430,11 +425,9 @@ swiper-container {
 @media (prefers-reduced-motion: reduce) {
   .package-card,
   .tour-image,
-  .cities-content,
   .call-btn,
   .request-btn {
     transition: none;
-    animation: none;
   }
 
   .package-card:hover {
@@ -446,62 +439,52 @@ swiper-container {
   }
 }
 
-/* Add these new styles to your CSS */
-.cities-wrapper {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
+// Update or add these styles in your tour-card.component.scss
 
-.cities-scroll {
-  width: 100%;
-  overflow: hidden;
-}
-
-.cities-scroll.scrollable .cities-content {
-  animation: scrollCities 15s linear infinite;
-}
-
-.cities-content {
-  display: inline-flex;
+.cities-visible {
+  display: flex;
+  flex-wrap: nowrap;
   gap: 6px;
-  white-space: nowrap;
-}
-
-.info-container {
+  width: 100%;
   position: relative;
-}
+  cursor: pointer;
 
-.tooltip-arrow {
-  position: absolute;
-  top: -6px;
-  right: 10px;
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.98);
-  transform: rotate(45deg);
-  box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.06);
-}
-
-.info-tooltip {
-  position: fixed;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 12px;
-  width: 250px;
-  z-index: 1000;
-}
-
-@keyframes scrollCities {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(calc(-50% - 3px));
+  &.truncated {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
   }
 }
 
-.cities-scroll:hover .cities-content {
-  animation-play-state: paused;
+::ng-deep .cities-tooltip {
+  opacity: 1 !important;
+
+  .tooltip-inner {
+    background: white;
+    color: #4a5568;
+    padding: 12px;
+    max-width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .tooltip-arrow::before {
+    border-bottom-color: white;
+  }
+
+  .cities-tooltip-content {
+    .city-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+
+      i {
+        color: var(--secondary-color);
+        font-size: 14px;
+      }
+
+      span {
+        font-size: 12px;
+      }
+    }
+  }
 }

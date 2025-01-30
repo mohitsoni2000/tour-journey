@@ -1,6 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, map, catchError, BehaviorSubject } from 'rxjs';
+import {
+  Observable,
+  of,
+  map,
+  catchError,
+  BehaviorSubject,
+  shareReplay,
+} from 'rxjs';
 
 export interface TourResponse {
   success: boolean;
@@ -14,6 +21,7 @@ export interface Tour {
   content: string;
   card_tag: string;
   short_desc: string;
+  highlights: string;
   price: string;
   sale_price: string;
   duration: number;
@@ -69,13 +77,27 @@ export class TourService {
   private apiUrl = 'https://journeybees.in';
   private toursSubject = new BehaviorSubject<TransformedTour[]>([]);
   private sliderToursSubject = new BehaviorSubject<SliderTour[]>([]);
+  private currentTourName: string | null = null;
+  private cachedTourData: Observable<any> | null = null;
 
   constructor(private http: HttpClient) {}
 
   getTourByName(
     tourName: string
   ): Observable<{ tours: TransformedTour[]; sliderTours: SliderTour[] }> {
-    return this.http
+    // Return cached data if available for the same tour
+    if (this.cachedTourData && this.currentTourName === tourName) {
+      return this.cachedTourData;
+    }
+
+    // Reset cache if tour name changes
+    if (this.currentTourName !== tourName) {
+      this.cachedTourData = null;
+    }
+
+    this.currentTourName = tourName;
+
+    this.cachedTourData = this.http
       .get<TourResponse>(`${this.apiUrl}/api/tours/${tourName}`)
       .pipe(
         map((response) => {
@@ -99,11 +121,10 @@ export class TourService {
             sliderTours: sliderTours,
           };
         }),
-        catchError((error) => {
-          console.error('Error fetching tours:', error);
-          throw error;
-        })
+        shareReplay(1) // Cache the result
       );
+
+    return this.cachedTourData;
   }
 
   getBanners(): Observable<Banner[]> {
@@ -143,8 +164,8 @@ export class TourService {
       salePrice: parseFloat(tour.sale_price),
       images: imageUrls,
       featured: tour.card_tag.trim(),
-      cities: tour?.address?.split(',')?.map((item) => item.trim()) ?? [],
-      highlights: Object.values(includes).map((item: any) => item.title),
+      cities: tour?.slider_tag?.split('#').map((item) => item.trim()) ?? [],
+      highlights: tour?.highlights?.split('#').map((item) => item.trim()) ?? [],
       description: tour.short_desc,
       content: tour.content,
     };

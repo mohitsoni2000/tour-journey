@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { BannerComponent } from './component/banner/banner.component';
 import { BreadcrumbsComponent } from './component/breadcrumbs/breadcrumbs.component';
 import { CallButtonComponent } from './component/call-button/call-button.component';
@@ -14,7 +20,7 @@ import { WhatsappButtonComponent } from './component/whatsapp-button/whatsapp-bu
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, filter, map, of, tap } from 'rxjs';
 import {
   Banner,
   SliderTour,
@@ -26,6 +32,8 @@ import {
   UserDetails,
 } from '../../service/common/common.service';
 import { EnquiryModalComponent } from '../../shared/enquiry-modal/enquiry-modal.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SeoService } from '../../service/seo/seo.service';
 
 @Component({
   selector: 'app-tour',
@@ -71,48 +79,64 @@ import { EnquiryModalComponent } from '../../shared/enquiry-modal/enquiry-modal.
     ]),
   ],
 })
-export class TourComponent {
+export class TourComponent implements OnDestroy {
   @ViewChild('enquiryModal') enquiryModal!: EnquiryModalComponent;
+  private destroyRef = inject(DestroyRef);
 
   private tourService = inject(TourService);
   private route = inject(ActivatedRoute);
   toursWithBanner$!: Observable<Array<{ type: 'tour' | 'banner'; data: any }>>;
-  userDeatils: UserDetails;
+  userDetails: UserDetails;
   sliderTours$: Observable<SliderTour[]> | undefined;
 
   constructor(
     private meta: Meta,
     private title: Title,
-    private router: Router,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private seoService: SeoService
   ) {
-    this.userDeatils = this.commonService.getUserDetails();
+    this.userDetails = this.commonService.getUserDetails();
+    this.initializeData();
   }
 
-  ngOnInit() {
-    this.updateTitle();
-    const tourName = this.route.snapshot.params['name'] || '';
-    
-    const tourData$ = this.tourService.getTourByName(tourName);
-
-    // Extract slider tours
-    this.sliderTours$ = tourData$.pipe(
-      map(response => response.sliderTours)
+  private initializeData() {
+    // Use resolver data instead of making a new API call
+    const resolvedData$ = this.route.data.pipe(
+      map((data) => data['tour']),
+      filter((data) => !!data),
+      takeUntilDestroyed(this.destroyRef)
     );
 
-    // Transform data for tour cards with banners
-    this.toursWithBanner$ = tourData$.pipe(
-      map(response => this.insertBanners(response.tours))
+    // Initialize slider tours stream
+    this.sliderTours$ = resolvedData$.pipe(map((data) => data.sliderTours));
+
+    // Initialize tours with banners stream
+    this.toursWithBanner$ = resolvedData$.pipe(
+      map((data) => this.insertBanners(data.tours)),
+      tap((tours) => {
+        if (tours.length > 0) {
+          const firstTour = tours.find((item) => item.type === 'tour')
+            ?.data as TransformedTour;
+          if (firstTour) {
+            this.seoService.updateTourSeo(firstTour);
+          }
+        }
+      })
     );
   }
 
-  private insertBanners(tours: TransformedTour[]): Array<{ type: 'tour' | 'banner'; data: TransformedTour | Banner }> {
-    const result: Array<{ type: 'tour' | 'banner'; data: TransformedTour | Banner }> = [];
-    
+  private insertBanners(
+    tours: TransformedTour[]
+  ): Array<{ type: 'tour' | 'banner'; data: TransformedTour | Banner }> {
+    const result: Array<{
+      type: 'tour' | 'banner';
+      data: TransformedTour | Banner;
+    }> = [];
+
     tours.forEach((tour, index) => {
       // Add tour
       result.push({ type: 'tour', data: tour });
-      
+
       // Add banner after every 6 tours
       if ((index + 1) % 6 === 0) {
         result.push({
@@ -121,66 +145,13 @@ export class TourComponent {
             title: 'Special Offer!',
             subtitle: 'Get up to 50% off on group bookings',
             ctaText: 'Book Now',
-            backgroundImage: 'assets/images/package/package-4.webp'
-          }
+            backgroundImage: 'assets/images/package/package-4.webp',
+          },
         });
       }
     });
-    
+
     return result;
-  }
-  
-  updateTitle() {
-    this.title.setTitle(
-      'Tour Packages in Bangkok - Best Hotel Deals | Your Site Name'
-    );
-    this.meta.addTags([
-      {
-        name: 'description',
-        content:
-          'Discover the best tour packages in Bangkok, Thailand. Find deals on hotels like Dusitd2 Samyan Bangkok with prices starting from $95.',
-      },
-      {
-        name: 'keywords',
-        content:
-          'Bangkok tours, Thailand hotels, Dusitd2 Samyan Bangkok, hotel deals',
-      },
-      {
-        property: 'og:title',
-        content: 'Tour Packages in Bangkok - Best Hotel Deals',
-      },
-      {
-        property: 'og:description',
-        content: 'Find the best tour packages in Bangkok starting from $95',
-      },
-      { property: 'og:image', content: 'URL-to-your-featured-image' },
-    ]);
-  }
-
-  private addSchemaMarkup(tour: any) {
-    // Implement schema markup logic here
-    const schema = {
-      '@context': 'https://schema.org',
-      '@type': 'TouristAttraction',
-      name: tour.name,
-      // Add other schema properties
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(schema);
-    document.head.appendChild(script);
-  }
-
-  private handleError(error: any) {
-    const errorMessage =
-      error.status === 404 ? 'Tour not found' : 'Error loading tour';
-    this.router.navigate(['/error'], {
-      queryParams: {
-        message: errorMessage,
-        status: error.status,
-      },
-    });
   }
 
   openEnquiryModal() {
@@ -189,5 +160,9 @@ export class TourComponent {
 
   handleCallRequest() {
     this.openEnquiryModal();
+  }
+
+  ngOnDestroy(): void {
+    this.seoService.removeAllMeta();
   }
 }

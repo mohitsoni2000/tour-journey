@@ -1,0 +1,41 @@
+<!-- location-search.component.html -->
+<div class="modal-container" [@modalAnimation]>
+  <div class="glass-modal">
+    <!-- Search Header -->
+    <div class="search-header" [@headerAnimation]>
+      <div class="search-input-group">
+        <i class="ri-search-line search-icon"></i>
+        <input #searchInput [formControl]="searchControl" class="search-input glass-input"
+          placeholder="Where would you like to go?" autocomplete="off" (keydown.enter)="onEnter()"
+          (keydown.arrowdown)="onArrowDown()" (keydown.arrowup)="onArrowUp()">
+        <button class="close-button" (click)="activeModal.dismiss()">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="search-results" [@resultsAnimation]>
+      <ng-container *ngIf="filteredLocations$ | async as filteredLocations">
+        <div class="no-results glass-effect"
+          *ngIf="(searchControl.value || '') !== '' && filteredLocations.length === 0" [@fadeIn]>
+          <i class="ri-map-pin-line"></i>
+          <p>No destinations found for "{{searchControl.value}}"</p>
+        </div>
+
+        <div class="location-grid" *ngIf="filteredLocations.length > 0">
+          <div *ngFor="let location of filteredLocations.slice(0, 9); let i = index" class="location-card glass-effect"
+            [class.active]="i === selectedIndex" (click)="selectLocation(location)" (mouseenter)="selectedIndex = i"
+            [@cardAnimation]>
+            <div class="location-content">
+              <h3 class="location-title">{{location.name}}</h3>
+              <span class="explore-link">
+                <i class="ri-arrow-right-s-line"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

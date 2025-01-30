@@ -1,6 +1,7 @@
 <!-- tour-card.component.html -->
 <div class="package-card animate__animated animate__fadeInUp">
     <div class="package-img">
+        <div class="gradient-overlay"></div>
         <swiper-container #swiperContainer init="false">
             @for (image of tour.images; track $index) {
             <swiper-slide>
@@ -20,23 +21,26 @@
         }
     </div>
 
-    <div class="package-content glass-effect">
+    <div class="package-content">
         <div class="d-flex align-items-center justify-content-between">
             <div class="duration-badge" @slideIn>
                 <i class="ri-time-line"></i>
                 <span>{{tour.duration}}</span>
             </div>
+            <div class="location" @slideIn>
+                <i class="ri-map-pin-line"></i>
+                <span>{{tour.location}}</span>
+            </div>
         </div>
 
-        <h3 class="area-name" @fadeIn>{{tour.title}}</h3>
-        <div class="location" @fadeIn>
-            <i class="ri-map-pin-line"></i>
-            <span>{{tour.location}}</span>
-        </div>
+        <h3 class="area-name" @fadeIn [ngbTooltip]="tour.title" [openDelay]="200" [closeDelay]="200"
+            [disableTooltip]="!isTitleTruncated" #tourTitle>{{tour.title}}</h3>
 
         <div class="cities-wrapper mb-2" @fadeIn>
-            <div class="cities-scroll" [class.scrollable]="isScrollable" #citiesScroll>
-                <div class="cities-content" #citiesContent>
+            <div class="cities-container" #citiesContainer>
+                <div class="cities-visible" [class.truncated]="isCitiesTruncated" [ngbTooltip]="citiesTemplate"
+                    [openDelay]="200" [closeDelay]="200" tooltipClass="cities-tooltip" container="body"
+                    [disableTooltip]="!isCitiesTruncated" placement="auto" #citiesListTooltip="ngbTooltip">
                     @for (city of tour.cities; track city) {
                     <span class="city-tag">
                         <i class="ri-building-line"></i>
@@ -46,8 +50,7 @@
                 </div>
             </div>
         </div>
-
-        <div class="price-section glass-effect" @scaleIn>
+        <div class="price-section" @scaleIn>
             <div class="price-block">
                 <div>
                     <div class="discounted-price">
@@ -59,20 +62,52 @@
                     </div>
                 </div>
                 <div class="info-container">
-                    <button class="info-btn" #tooltipBtn>
-                        Read More
+                    <button class="info-btn" [ngbTooltip]="highlightsTemplate" tooltipClass="highlights-tooltip"
+                        [openDelay]="200" [closeDelay]="200" placement="auto" container="body" [autoClose]="true"
+                        triggers="manual" #t="ngbTooltip" (mouseenter)="t.toggle()" (mouseleave)="t.toggle()">
+                        Tour Highlights
                     </button>
                 </div>
             </div>
         </div>
 
         <div class="action-buttons" @slideIn>
-            <a class="call-btn glass-effect" [href]="'tel:' + phoneNumber">
+            <a class="call-btn" [href]="'tel:' + phoneNumber">
                 <i class="ri-phone-line"></i>
             </a>
-            <button class="request-btn glass-effect" (click)="openEnquiryModal()">
+            <button class="request-btn" (click)="openEnquiryModal()">
                 Request Callback
             </button>
         </div>
     </div>
 </div>
+
+<ng-template #highlightsTemplate>
+    <div class="highlights-content">
+        <ng-container *ngIf="tour.highlights.length; else noRecords">
+            @for (highlight of tour.highlights; track highlight) {
+            <div class="highlight-item">
+                <i class="ri-check-line"></i>
+                <span>{{highlight}}</span>
+            </div>
+            }
+        </ng-container>
+        <ng-template #noRecords>
+            <div class="no-records">
+                No highlights available.
+            </div>
+        </ng-template>
+
+    </div>
+</ng-template>
+
+<ng-template #citiesTemplate>
+    <div class="cities-tooltip-content">
+        @for (city of tour.cities; track city) {
+        <div class="city-item">
+            <i class="ri-building-line"></i>
+            <span>{{city}}</span>
+        </div>
+        }
+    </div>
+</ng-template>

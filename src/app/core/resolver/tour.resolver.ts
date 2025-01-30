@@ -13,15 +13,16 @@ export class TourResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot): Observable<any> {
     const tourName = route.paramMap.get('name');
+    if (!tourName) {
+      this.router.navigate(['/error']);
+      return of(null);
+    }
 
-    return this.tourService.getTourByName(tourName!).pipe(
+    return this.tourService.getTourByName(tourName).pipe(
       catchError((error) => {
         if (error.status === 404) {
           this.router.navigate(['/error'], {
-            queryParams: {
-              message: 'Tour not found',
-              status: 404,
-            },
+            queryParams: { message: 'Tour not found', status: 404 },
           });
         } else {
           this.router.navigate(['/error'], {

@@ -33,6 +33,7 @@ export class TourPackageComponent {
 
   private loadTourPackage(tourName: string): void {
     this.isLoading = true;
+    this.error = '';
     this.tourPackageService.getTourPackages(tourName).subscribe({
       next: (response: APIResponse) => {
         if (response.success && response.data.length > 0) {

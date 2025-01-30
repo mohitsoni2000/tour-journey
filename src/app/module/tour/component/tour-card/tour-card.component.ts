@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   EventEmitter,
+  HostListener,
   Input,
   OnDestroy,
   OnInit,
@@ -12,17 +13,17 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NgbTooltipModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { TransformedTour } from '../../../../service/tour/tour.service';
-import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-tour-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgbTooltipModule],
   templateUrl: './tour-card.component.html',
+  styleUrls: ['./tour-card.component.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  styleUrl: './tour-card.component.scss',
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -48,21 +49,6 @@ import * as bootstrap from 'bootstrap';
         ),
       ]),
     ]),
-    trigger('tooltip', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate(
-          '200ms cubic-bezier(0.4, 0, 0.2, 1)',
-          style({ opacity: 1, transform: 'translateY(0)' })
-        ),
-      ]),
-      transition(':leave', [
-        animate(
-          '150ms cubic-bezier(0.4, 0, 0.2, 1)',
-          style({ opacity: 0, transform: 'translateY(10px)' })
-        ),
-      ]),
-    ]),
   ],
 })
 export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -71,22 +57,69 @@ export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() enquiryModalVisibleChange = new EventEmitter<boolean>();
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;
-  @ViewChild('citiesContent') citiesContent!: ElementRef;
-  @ViewChild('citiesScroll') citiesScroll!: ElementRef;
-  @ViewChild('tooltipBtn') tooltipBtn!: ElementRef;
+  @ViewChild('tourTitle') tourTitle!: ElementRef;
+  @ViewChild('citiesContainer') citiesContainer!: ElementRef;
+  @ViewChild('t') tooltip!: NgbTooltip;
+  @ViewChild('citiesListTooltip') citiesListTooltip!: NgbTooltip;
 
-  isScrollable = false;
+  isTitleTruncated = false;
+  isCitiesTruncated = false;
+  showAllCities = false;
+  visibleCities: string[] = [];
   discountedPrice: number = 0;
   savingsAmount: number = 0;
-  private tooltipInstance: any;
+
+  private resizeObserver: ResizeObserver;
+  private intersectionObserver: IntersectionObserver;
+
+  constructor(private elementRef: ElementRef) {
+    // Initialize resize observer for handling responsive truncation
+    this.resizeObserver = new ResizeObserver(() => {
+      this.checkTruncation();
+    });
+
+    // Initialize intersection observer for lazy initialization
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          this.initializeSwiper();
+          this.intersectionObserver.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+  }
 
   ngOnInit() {
+    this.calculatePrices();
+  }
+
+  ngAfterViewInit() {
+    // Observe the component for viewport visibility
+    this.intersectionObserver.observe(this.swiperContainer.nativeElement);
+
+    // Start observing size changes for truncation
+    this.setupResizeObservers();
+
+    // Initial truncation check
+    this.checkTruncation();
+  }
+
+  private calculatePrices() {
     this.discountedPrice = this.tour.salePrice;
     this.savingsAmount = this.tour.price - this.tour.salePrice;
   }
 
-  ngAfterViewInit() {
-    // Initialize Swiper
+  private setupResizeObservers() {
+    if (this.tourTitle?.nativeElement) {
+      this.resizeObserver.observe(this.tourTitle.nativeElement);
+    }
+    if (this.citiesContainer?.nativeElement) {
+      this.resizeObserver.observe(this.citiesContainer.nativeElement);
+    }
+  }
+
+  private initializeSwiper() {
     const swiperEl = this.swiperContainer.nativeElement;
     const swiperParams = {
       slidesPerView: 1,
@@ -107,60 +140,89 @@ export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
         disableOnInteraction: false,
       },
     };
+
     Object.assign(swiperEl, swiperParams);
     swiperEl.initialize();
-
-    // Initialize Bootstrap tooltip
-    this.initTooltip();
-
-    // Check if cities content needs scrolling
-    setTimeout(() => {
-      this.checkScrollable();
-    });
-
-    // Add resize listener
-    window.addEventListener('resize', this.handleResize);
   }
 
-  private handleResize = () => {
-    this.checkScrollable();
-  };
-
-  private initTooltip() {
-    const tooltipTrigger = this.tooltipBtn.nativeElement;
-    const tooltipContent = this.tour.highlights.map(highlight => 
-      `<div style="display:flex;align-items:center;margin-bottom:4px">
-        <i class="ri-check-line" style="color:#4caf50;margin-right:8px"></i>
-        <span style="font-size:12px">${highlight} testtt</span>
-      </div>`
-    ).join('');
-
-    this.tooltipInstance = new bootstrap.Tooltip(tooltipTrigger, {
-      html: true,
-      title: tooltipContent,
-      template: `
-        <div class="tooltip" role="tooltip">
-          <div class="tooltip-arrow"></div>
-          <div class="tooltip-inner" style="background:white;color:#4a5568;max-width:300px;text-align:left"></div>
-        </div>`
+  private checkTruncation() {
+    // Use requestAnimationFrame to ensure DOM measurements are accurate
+    requestAnimationFrame(() => {
+      this.checkTitleTruncation();
+      this.checkCitiesTruncation();
     });
   }
 
-  checkScrollable() {
-    const content = this.citiesContent.nativeElement;
-    const scroll = this.citiesScroll.nativeElement;
-    this.isScrollable = content.scrollWidth > scroll.clientWidth;
+  private checkTitleTruncation() {
+    if (!this.tourTitle?.nativeElement) return;
+
+    const element = this.tourTitle.nativeElement;
+    this.isTitleTruncated = element.scrollWidth > element.clientWidth;
   }
 
+  private checkCitiesTruncation() {
+    if (!this.citiesContainer?.nativeElement || !this.tour.cities.length) return;
+
+    const container = this.citiesContainer.nativeElement;
+    const citiesContainer = container.querySelector('.cities-visible');
+
+    if (!citiesContainer) return;
+
+    const containerWidth = container.clientWidth;
+    const citiesWidth = this.calculateTotalCitiesWidth(citiesContainer);
+
+    this.isCitiesTruncated = citiesWidth > containerWidth;
+    
+    // Close tooltip if cities are not truncated
+    if (!this.isCitiesTruncated && this.citiesListTooltip) {
+        this.citiesListTooltip.close();
+    }
+}
+
+  private calculateTotalCitiesWidth(container: HTMLElement): number {
+    let totalWidth = 0;
+    const cityElements = container.querySelectorAll('.city-tag');
+
+    cityElements.forEach((cityEl: Element) => {
+      const styles = window.getComputedStyle(cityEl);
+      const width = (cityEl as HTMLElement).offsetWidth;
+      const marginRight = parseFloat(styles.marginRight);
+      totalWidth += width + (isNaN(marginRight) ? 0 : marginRight);
+    });
+
+    return totalWidth;
+  }
+
+  @HostListener('window:resize')
+  onWindowResize() {
+    this.checkTruncation();
+  }
+
+  toggleCitiesView(event: MouseEvent) {
+    if (this.isCitiesTruncated) {
+      this.showAllCities = !this.showAllCities;
+      event.stopPropagation();
+    }
+  }
 
   openEnquiryModal() {
     this.enquiryModalVisibleChange.emit(true);
   }
 
-  ngOnDestroy() {
-    if (this.tooltipInstance) {
-      this.tooltipInstance.dispose();
+  // Update the HostListener for document clicks
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.tooltip?.close();
+      this.citiesListTooltip?.close();
     }
-    window.removeEventListener('resize', this.handleResize);
+    this.showAllCities = false;
+  }
+
+  // Add this to ngOnDestroy
+  ngOnDestroy() {
+    this.resizeObserver.disconnect();
+    this.intersectionObserver.disconnect();
+    this.citiesListTooltip?.close();
   }
 }

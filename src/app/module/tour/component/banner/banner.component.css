@@ -1,46 +1,370 @@
 :host {
   display: block;
+  width: 100%;
 }
+
+/* Glassmorphism Variables */
+:root {
+  --glass-background: rgba(255, 255, 255, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.125);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+}
+
 .promotion-banner {
   position: relative;
   width: 100%;
-  min-height: 200px;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   background-size: cover;
   background-position: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  padding: 2rem;
 }
 
-.banner-content {
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.banner-content,
-h2,
-p {
-  color: white;
-}
-
-.promotion-banner::before {
-  content: "";
+.glass-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0)
+  );
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.query-form-wrapper {
+  width: 100%;
+  z-index: 2;
+}
 
+.glass-form {
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px 0 var(--glass-shadow),
+    inset 0 0 0 1px var(--glass-border);
+  backdrop-filter: blur(15px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+}
 
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.header-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.header-icon i {
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-header h3 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.form-header p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0;
+}
+
+.form-fields {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-field {
+  position: relative;
+  flex: 1;
+
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 1;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-field input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.form-field.has-error input {
+  border-color: rgba(255, 50, 50, 0.5);
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.call-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.2);
+}
+
+.call-btn i {
+  font-size: 20px;
+}
+
+.request-btn:hover,
+.call-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 87, 34, 0.3);
+  background: #f4511e;
+}
+
+/* Action buttons styles */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+button[type="submit"] {
+  width: 80%;
+  padding: 14px;
+  background: linear-gradient(45deg, var(--secondary-color), #ff8533);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .promotion-banner {
-    min-height: 160px;
+    /* min-height: 100vh; */
+    padding: 1rem;
+  }
+
+  .query-form-wrapper {
+    width: 90%;
+    max-width: 100%;
+  }
+
+  .glass-form {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Accessibility and Focus States */
+input:focus,
+button:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Add to existing CSS - Animation Enhancements */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Subtle Hover and Focus Effects */
+.form-field input:hover,
+.form-field input:focus {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+  transition: all 0.3s ease;
+}
+
+/* Validation State Animations */
+.form-field.has-error input {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Subtle Pulsing Effect for Call Button */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.call-btn:hover {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Disabled Button State */
+.action-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  animation: fadeDisabled 0.3s ease-in-out;
+}
+
+@keyframes fadeDisabled {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+/* Form Interaction Glow */
+.form-field input:focus {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Progressive Enhancement for Smooth Transitions */
+* {
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Error Message Animation */
+.error-message {
+  animation: errorSlideIn 0.3s ease-out;
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .promotion-banner {
+    padding: 0.5rem;
+  }
+
+  .glass-form {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-fields {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .glass-form {
     padding: 1.5rem;
+    margin: 0.5rem;
+  }
+
+  .form-field {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+  }
+
+  button[type="submit"] {
+    width: calc(100% - 60px); /* Adjust width accounting for call button */
+  }
+
+  .call-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .form-field input {
+    padding: 14px 12px 14px 40px;
+    font-size: 16px; /* Better for mobile touch targets */
   }
 }

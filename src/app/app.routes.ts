@@ -7,11 +7,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./module/tour/tour.component').then((m) => m.TourComponent),
     resolve: {
-      tour: TourResolver,
+      tour: TourResolver
     },
-    data: {
-      title: 'Tour Details',
-    },
+    runGuardsAndResolvers: 'always'
   },
   {
     path: '',

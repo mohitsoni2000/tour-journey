@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export interface SettingResponse {
+export interface ApiResponse {
   success: boolean;
   data: Array<{
     name: string;
@@ -16,9 +16,15 @@ export interface SettingResponse {
 export class HeaderService {
   constructor(private http: HttpClient) {}
 
-  fetchHeaderSettings(): Observable<SettingResponse> {
-    return this.http.get<SettingResponse>(
+  fetchHeaderSettings(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(
       'https://journeybees.in/api/setting'
+    );
+  }
+
+  fetchLocations(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(
+      'https://journeybees.in/api/alllocation'
     );
   }
 }

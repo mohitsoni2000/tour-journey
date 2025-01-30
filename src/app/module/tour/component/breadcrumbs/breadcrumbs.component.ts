@@ -49,21 +49,10 @@ export interface TourPackage {
 export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;
   queryForm: FormGroup;
-  private swiperInstance: any;
-
-  cities: string[] = [
-    'Dubai',
-    'Abu Dhabi',
-    'Sharjah',
-    'Ajman',
-    'Ras Al Khaimah',
-    'Fujairah',
-    'Umm Al Quwain',
-  ];
+  private swiperEl: any;
+  userDeatils: UserDetails;
 
   @Input() packages: SliderTour[] = [];
-
-  userDeatils: UserDetails;
 
   constructor(
     private fb: FormBuilder,
@@ -71,12 +60,99 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     private queryService: QueryService
   ) {
     this.userDeatils = this.commonService.getUserDetails();
-
     this.queryForm = this.initForm();
   }
 
   ngOnInit(): void {
-    this.initializeFormValidation();
+    if (!this.packages.length) {
+      console.warn('No packages loaded');
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.initializeSwiper();
+  }
+
+  private initializeSwiper(): void {
+    if (!this.swiperContainer?.nativeElement) return;
+
+    this.swiperEl = this.swiperContainer.nativeElement;
+
+    const swiperParams = {
+      injectStyles: [
+        `
+          .swiper-slide {
+            height: 100vh;
+            width: 100%;
+          }
+        `,
+      ],
+      slidesPerView: 1,
+      spaceBetween: 0,
+      loop: true,
+      effect: 'fade',
+      fadeEffect: {
+        crossFade: true,
+      },
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      on: {
+        init: () => {
+          this.handleSlideAnimations();
+        },
+        slideChange: () => {
+          this.handleSlideAnimations();
+        },
+      },
+    };
+
+    Object.assign(this.swiperEl, swiperParams);
+
+    // Initialize Swiper
+    setTimeout(() => {
+      this.swiperEl.initialize();
+    }, 100);
+  }
+
+  private handleSlideAnimations(): void {
+    const activeSlide = this.swiperEl?.querySelector('.swiper-slide-active');
+    if (!activeSlide) return;
+
+    const elements = activeSlide.querySelectorAll('.slide-content > *');
+    elements.forEach((el: Element, index: number) => {
+      const element = el as HTMLElement;
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      }, 100 * (index + 1));
+    });
+  }
+
+  calculateDiscount(tourPackage: SliderTour): number {
+    if (!tourPackage.price || !tourPackage.salePrice) return 0;
+    const discount =
+      ((tourPackage.price - tourPackage.salePrice) / tourPackage.price) * 100;
+    return Math.round(discount);
+  }
+
+  onSubmit(): void {
+    if (this.queryForm.valid) {
+      this.queryService.sendQuery(this.queryForm.value).subscribe({
+        next: (response) => {
+          if (response.success) {
+            window.location.href = 'https://journeybees.in/thank-you.html';
+          }
+        },
+        error: (error) => {
+          console.error('Error submitting query:', error);
+        },
+      });
+    }
   }
 
   private initForm(): FormGroup {
@@ -87,125 +163,9 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private initializeFormValidation(): void {
-    // Add dynamic validation for departure date
-    const departureDateControl = this.queryForm.get('departureDate');
-    if (departureDateControl) {
-      departureDateControl.valueChanges.subscribe(() => {
-        departureDateControl.updateValueAndValidity();
-      });
-    }
-  }
-
-  ngAfterViewInit(): void {
-    this.initializeSwiper();
-  }
-
-  calculateDiscount(tourPackage: SliderTour): number {
-    const discount = ((tourPackage.price - tourPackage.salePrice) / tourPackage.price) * 100;
-    return Math.round(discount);
-  }
-
-  private initializeSwiper(): void {
-    if (!this.swiperContainer) return;
-
-    const swiperEl = this.swiperContainer.nativeElement;
-    const swiperParams = {
-      slidesPerView: 1,
-      speed: 1000,
-      loop: true,
-      effect: 'fade',
-      observer: true,
-      observeParents: true,
-      resizeObserver: true,
-      breakpoints: {
-        768: {
-          effect: 'slide', // Different effect for desktop
-          fadeEffect: { crossFade: false }
-        }
-      },
-      fadeEffect: {
-        crossFade: true,
-      },
-      autoplay: {
-        delay: 5000,
-        disableOnInteraction: false,
-      },
-      on: {
-        init: () => {
-          this.handleSlideAnimations('init');
-        },
-        slideChangeTransitionStart: () => {
-          this.handleSlideAnimations('change');
-        },
-      },
-    };
-
-    Object.assign(swiperEl, swiperParams);
-    swiperEl.initialize();
-    this.swiperInstance = swiperEl;
-    window.addEventListener('resize', () => {
-      if (this.swiperInstance) {
-        this.swiperInstance.update();
-      }
-    });
-  }
-
-  private handleSlideAnimations(event: 'init' | 'change'): void {
-    const activeSlide = document.querySelector('.swiper-slide-active');
-    if (!activeSlide) return;
-
-    const elements = activeSlide.querySelectorAll('.slide-content > *');
-    elements.forEach((el, index) => {
-      const element = el as HTMLElement;
-
-      if (event === 'change') {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-      }
-
-      setTimeout(() => {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
-      }, 100 * (index + 1));
-    });
-  }
-
-  onSubmit(): void {
-    if (this.queryForm.valid) {
-      const formData = this.queryForm.value;
-      this.queryService.sendQuery(formData).subscribe({
-        next: (response) => {
-          if (response.success) {
-            window.location.href = 'https://journeybees.in/thank-you.html';
-          }
-        },
-        error: (error) => {
-          console.error('Error submitting enquiry:', error);
-          // Handle error (e.g., show error message to user)
-        },
-      });
-      this.queryForm.reset();
-
-      // Show success message or handle response
-      alert('Thank you! Our team will contact you shortly.');
-    } else {
-      this.markFormGroupTouched(this.queryForm);
-    }
-  }
-
-  private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach((control) => {
-      control.markAsTouched();
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
-    });
-  }
-
   ngOnDestroy(): void {
-    if (this.swiperInstance) {
-      this.swiperInstance.destroy();
+    if (this.swiperEl) {
+      this.swiperEl.destroy?.();
     }
   }
 }

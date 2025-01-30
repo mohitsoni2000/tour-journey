@@ -100,7 +100,7 @@
 
         <!-- Actual Content -->
         <ng-container *ngIf="!isLoading">
-          <a *ngFor="let dest of destinations" [routerLink]="'/tour' + dest.url"
+          <a *ngFor="let dest of destinations" (click)="selectDestination(dest)"
             class="destination-card animate__animated animate__fadeIn">
             <div class="card-image">
               <img [src]="dest.imageUrl" loading="lazy" [alt]="dest.name">

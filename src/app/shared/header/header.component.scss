@@ -168,7 +168,7 @@
 
   .destination-wrapper {
     display: inline-block;
-    min-width: 80px;
+    min-width: 160px;
     position: relative;
     height: 20px;
     overflow: hidden;
@@ -485,6 +485,11 @@
 @media (max-width: 768px) {
   .logo img {
     height: 35px;
+  }
+
+  .destination-wrapper{
+    min-width: 100% !important;
+    width: 100% !important;
   }
 
   .right-section {

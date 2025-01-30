@@ -18,6 +18,8 @@ import {
 } from '../../service/common/common.service';
 import { RouterModule } from '@angular/router';
 import { HeaderService } from '../../service/header/header.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LocationSearchComponent } from '../location-search/location-search.component';
 
 interface SearchModel {
   searchTerm: string;
@@ -74,16 +76,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isSearchFormOpen = false;
   showAnnouncement = true;
   searchDestination = 'Dubai';
-  @Output() enquiryModalVisibleChange = new EventEmitter<boolean>();
-  cities: string[] = [
-    'Dubai',
-    'Paris',
-    'London',
-    'New York',
-    'Tokyo',
-    'Singapore',
-    'Bangkok',
-  ];
+  cities: string[] = [];
   currentCityIndex = 0;
   currentCity = this.cities[0];
   private cityInterval: any;
@@ -106,10 +99,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef;
   announcementText: string = '';
   userDeatils: UserDetails;
-
+  locations: any[] = [];
   constructor(
     private commonService: CommonService,
-    private headerService: HeaderService
+    private headerService: HeaderService,
+    private modalService: NgbModal
   ) {
     this.userDeatils = this.commonService.getUserDetails();
   }
@@ -117,6 +111,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.startCityAnimation();
     this.fetchHeaderSettings();
+    this.headerService.fetchLocations().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.cities = response.data.map((item) => item.name);
+          this.currentCity = this.cities[0];
+          this.locations = response.data;
+        }
+      },
+    });
   }
 
   private fetchHeaderSettings(): void {
@@ -166,16 +169,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   toggleSearchForm(): void {
-    this.enquiryModalVisibleChange.emit();
-    // this.isSearchFormOpen = !this.isSearchFormOpen;
-    // if (this.isSearchFormOpen) {
-    //   document.body.style.overflow = 'hidden';
-    //   setTimeout(() => {
-    //     this.searchInput?.nativeElement?.focus();
-    //   }, 300);
-    // } else {
-    //   document.body.style.overflow = 'auto';
-    // }
+    const modalRef = this.modalService.open(LocationSearchComponent, {
+      windowClass: 'search-modal-window',
+      centered: true,
+      size: 'xl',
+      backdrop: true,
+      animation: true,
+      keyboard: true,
+      modalDialogClass: 'glass-modal-dialog',
+    });
+
+    modalRef.componentInstance.locations = this.locations;
   }
 
   closeSearchForm(): void {
