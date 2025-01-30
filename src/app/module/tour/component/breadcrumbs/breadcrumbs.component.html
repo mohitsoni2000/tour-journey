@@ -16,10 +16,10 @@
                             {{ package.title }}
                         </h1>
 
-                        <div class="location-wrapper">
+                        <!-- <div class="location-wrapper">
                             <i class="ri-map-pin-line"></i>
                             {{ package.location }}
-                        </div>
+                        </div> -->
 
                         <div class="highlights-wrapper">
                             @for(highlight of package.highlights; track highlight) {
@@ -32,7 +32,7 @@
 
                         <div class="savings-banner">
                             <i class="ri-price-tag-3-line"></i>
-                            Save upto 20% on Dubai Tour Packages
+                            Save up to {{ calculateDiscount(package) }}% on {{ package.location }} Tour Packages
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                         [class.invalid]="queryForm.get('phone')?.invalid && queryForm.get('phone')?.touched">
                 </div>
                 <div class="action-buttons">
-                    <a href="tel:{{userDeatils.phone}}" class="call-btn" >
+                    <a href="tel:{{userDeatils.phone}}" class="call-btn">
                         <i class="ri-phone-line"></i>
                     </a>
                     <button type="submit" [disabled]="queryForm.invalid">

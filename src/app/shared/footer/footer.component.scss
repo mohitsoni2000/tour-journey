@@ -112,9 +112,10 @@
 }
 
 .partner-logos {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  display: block;
+  // display: grid;
+  // grid-template-columns: repeat(2, 1fr);
+  // gap: 1rem;
 
   .partner-logo {
     max-width: 100%;

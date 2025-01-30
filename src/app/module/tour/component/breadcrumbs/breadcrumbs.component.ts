@@ -101,6 +101,11 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initializeSwiper();
   }
 
+  calculateDiscount(tourPackage: SliderTour): number {
+    const discount = ((tourPackage.price - tourPackage.salePrice) / tourPackage.price) * 100;
+    return Math.round(discount);
+  }
+
   private initializeSwiper(): void {
     if (!this.swiperContainer) return;
 
@@ -110,6 +115,15 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
       speed: 1000,
       loop: true,
       effect: 'fade',
+      observer: true,
+      observeParents: true,
+      resizeObserver: true,
+      breakpoints: {
+        768: {
+          effect: 'slide', // Different effect for desktop
+          fadeEffect: { crossFade: false }
+        }
+      },
       fadeEffect: {
         crossFade: true,
       },
@@ -130,6 +144,11 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     Object.assign(swiperEl, swiperParams);
     swiperEl.initialize();
     this.swiperInstance = swiperEl;
+    window.addEventListener('resize', () => {
+      if (this.swiperInstance) {
+        this.swiperInstance.update();
+      }
+    });
   }
 
   private handleSlideAnimations(event: 'init' | 'change'): void {

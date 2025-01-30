@@ -1,8 +1,8 @@
 <!-- footer.component.html -->
 <footer class="footer-section">
-    <div class="container">
-        <!-- Main Footer Sections -->
-        <!-- <div class="footer-main-section  animate-on-scroll" @fadeInUp>
+  <div class="container">
+    <!-- Main Footer Sections -->
+    <!-- <div class="footer-main-section  animate-on-scroll" @fadeInUp>
             <img src="assets/images/logo/logo.png" loading="lazy" alt="Vinay Ashija Logo" class="footer-logo">
             <div class="footer-grid">
                 <div *ngFor="let section of footerSections" class="footer-column">
@@ -19,94 +19,103 @@
             </div>
         </div> -->
 
-        <div class="footer-main-section">
-            <!-- DO YOU NEED HELP? Section -->
-            <div class="footer-column">
-              <h3 class="footer-title">DO YOU NEED HELP?</h3>
-              <div class="contact-info">
-                <div class="contact-item">
-                  <span class="label">Call us:</span>
-                  <a href="tel:{{userDeatils.phone}}" class="contact-link">{{userDeatils.phone}}</a>
-                </div>
-                <div class="contact-item">
-                  <span class="label">E-Mail for us</span>
-                  <a href="mailto:{{userDeatils.email}}" class="contact-link">{{userDeatils.email}}</a>
-                </div>
-                <div class="contact-item">
-                  <span class="label">Follow us</span>
-                  <div class="social-links" *ngFor="let link of socialLinks">
-                    <a [href]="link.url" [attr.aria-label]="link.label" class="social-link"><i [class]="link.icon"></i></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          
-            <!-- COMPANY Section -->
-            <div class="footer-column">
-              <h3 class="footer-title">COMPANY</h3>
-              <ul class="footer-links">
-                <li><a href="https://journeybees.in/page/about-us">About us</a></li>
-              </ul>
-              <div class="payment-methods">
-                <img src="path-to-paypal-image.png" alt="PayPal" class="payment-icon">
-                <img src="path-to-payumoney-image.png" alt="PayUMoney" class="payment-icon">
-              </div>
-            </div>
-          
-            <!-- SUPPORT Section -->
-            <div class="footer-column">
-              <h3 class="footer-title">SUPPORT</h3>
-              <ul class="footer-links">
-                <li><a href="https://journeybees.in/page/terms-and-conditions">Terms and Conditions</a></li>
-                <li><a href="https://journeybees.in/contact">Contact us</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-              </ul>
-            </div>
-          
-            <!-- MEMBERSHIPS & PARTNER Section -->
-            <div class="footer-column">
-              <h3 class="footer-title">MEMBERSHIPS & PARTNER</h3>
-              <div class="partner-logos">
-                <!-- Add your partner logos here -->
-                <img src="path-to-ministry-logo.png" alt="Ministry of Tourism" class="partner-logo">
-                <img src="path-to-iato-logo.png" alt="IATO" class="partner-logo">
-                <img src="path-to-itb-logo.png" alt="ITB Berlin" class="partner-logo">
-                <img src="path-to-ttf-logo.png" alt="TTF" class="partner-logo">
-                <img src="path-to-tripadvisor-logo.png" alt="TripAdvisor" class="partner-logo">
-              </div>
+    <div class="footer-main-section">
+      <!-- DO YOU NEED HELP? Section -->
+      <div class="footer-column">
+        <h3 class="footer-title">DO YOU NEED HELP?</h3>
+        <div class="contact-info">
+          <div class="contact-item">
+            <span class="label">Call us:</span>
+            <a href="tel:{{userDeatils.phone}}" class="contact-link">{{userDeatils.phone}}</a>
+          </div>
+          <div class="contact-item">
+            <span class="label">E-Mail for us</span>
+            <a href="mailto:{{userDeatils.email}}" class="contact-link">{{userDeatils.email}}</a>
+          </div>
+          <div class="contact-item">
+            <span class="label">Follow us</span>
+            <div class="social-links">
+              <ng-container *ngFor="let link of socialLinks">
+                <a [href]="link.url" [attr.aria-label]="link.label" class="social-link"><i [class]="link.icon"></i></a>
+              </ng-container>
             </div>
           </div>
-
-        <!-- Destinations Grid -->
-        <div class="destinations-section animate-on-scroll" @fadeInUp>
-            <h3 class="footer-title">TRAVEL DESTINATIONS</h3>
-            <div class="destinations-grid">
-                <!-- Skeleton Loading -->
-                <ng-container *ngIf="isLoading">
-                    <div *ngFor="let i of [1,2,3,4,5,6]" class="destination-card skeleton">
-                        <div class="card-image skeleton-image"></div>
-                        <div class="skeleton-text"></div>
-                    </div>
-                </ng-container>
-
-                <!-- Actual Content -->
-                <ng-container *ngIf="!isLoading">
-                    <a *ngFor="let dest of destinations" [routerLink]="'/tour' + dest.url"
-                        class="destination-card animate__animated animate__fadeIn">
-                        <div class="card-image">
-                            <img [src]="dest.imageUrl" loading="lazy" [alt]="dest.name">
-                            <div class="overlay">
-                                <span class="overlay-text">{{ dest.overlayText }}</span>
-                            </div>
-                        </div>
-                        <h4 class="destination-name">{{ dest.name }}</h4>
-                    </a>
-                </ng-container>
-            </div>
         </div>
+      </div>
 
-        <!-- Popular Activities -->
-        <!-- <div class="activities-section animate-on-scroll" @fadeInUp>
+      <!-- COMPANY Section -->
+      <div class="footer-column">
+        <h3 class="footer-title">COMPANY</h3>
+        <ul class="footer-links">
+          <li><a href="https://journeybees.in/page/about-us">About us</a></li>
+        </ul>
+        <div class="payment-methods">
+          <img src="assets/images/footer/paypal_credit_cards.gif" alt="PayPal" class="payment-icon">
+          <a href="https://www.payumoney.com/paybypayumoney/#/3615F3B4BAA9FAC2B4AD825A32EF62AF"> <img
+              src="assets/images/footer/payu_logo.webp" alt="PayUMoney" class="payment-icon"></a>
+        </div>
+      </div>
+
+      <!-- SUPPORT Section -->
+      <div class="footer-column">
+        <h3 class="footer-title">SUPPORT</h3>
+        <ul class="footer-links">
+          <li><a href="https://journeybees.in/page/terms-and-conditions">Terms and Conditions</a></li>
+          <li><a href="https://journeybees.in/contact">Contact us</a></li>
+          <li><a href="https://journeybees.in/page/privacy-policy">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <!-- MEMBERSHIPS & PARTNER Section -->
+      <div class="footer-column">
+        <h3 class="footer-title">MEMBERSHIPS & PARTNER</h3>
+        <div class="partner-logos">
+          <!-- Add your partner logos here -->
+          <a href="https://journeybees.in/uploads/downloads/mota_certificate_eng.pdf"><img width="70px"
+              src="assets/images/footer/mota-logo.webp" alt="Ministry of Tourism" class="partner-logo"></a>
+          <a href="https://journeybees.in/uploads/downloads/IATO_ApprovalLetter.pdf"><img width="70px"
+              src="assets/images/footer/iato.webp" alt="IATO" class="partner-logo"></a>
+          <img src="assets/images/footer/ITB-Berlin-Logo.webp" width="40px" alt="ITB Berlin" class="partner-logo">
+          <a href="https://journeybees.in/uploads/downloads/ttf_excellence.pdf"><img width="150px"
+              src="assets/images/footer/TTF_Logo_-_2019.webp" alt="TTF" class="partner-logo"></a>
+          <a
+            href="https://www.tripadvisor.in/Attraction_Review-g304551-d15610526-Reviews-Journey_Bees-New_Delhi_National_Capital_Territory_of_Delhi.html"><img
+              src="assets/images/footer/tripadvisor-logo_84.webp" width="200px" alt="TripAdvisor"
+              class="partner-logo"></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Destinations Grid -->
+    <div class="destinations-section animate-on-scroll" @fadeInUp>
+      <h3 class="footer-title">TRAVEL DESTINATIONS</h3>
+      <div class="destinations-grid">
+        <!-- Skeleton Loading -->
+        <ng-container *ngIf="isLoading">
+          <div *ngFor="let i of [1,2,3,4,5,6]" class="destination-card skeleton">
+            <div class="card-image skeleton-image"></div>
+            <div class="skeleton-text"></div>
+          </div>
+        </ng-container>
+
+        <!-- Actual Content -->
+        <ng-container *ngIf="!isLoading">
+          <a *ngFor="let dest of destinations" [routerLink]="'/tour' + dest.url"
+            class="destination-card animate__animated animate__fadeIn">
+            <div class="card-image">
+              <img [src]="dest.imageUrl" loading="lazy" [alt]="dest.name">
+              <div class="overlay">
+                <span class="overlay-text">{{ dest.overlayText }}</span>
+              </div>
+            </div>
+            <h4 class="destination-name">{{ dest.name }}</h4>
+          </a>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Popular Activities -->
+    <!-- <div class="activities-section animate-on-scroll" @fadeInUp>
             <h3 class="footer-title">POPULAR ACTIVITIES</h3>
             <div class="tags-container">
                 <a *ngFor="let activity of popularActivities" href="javascript:void(0)"
@@ -116,8 +125,8 @@
             </div>
         </div> -->
 
-        <!-- International Destinations -->
-        <!-- <div class="international-section animate-on-scroll" @fadeInUp>
+    <!-- International Destinations -->
+    <!-- <div class="international-section animate-on-scroll" @fadeInUp>
             <h3 class="footer-title">INTERNATIONAL DESTINATIONS</h3>
             <div class="tags-container">
                 <a *ngFor="let destination of internationalDestinations" href="javascript:void(0)"
@@ -127,25 +136,24 @@
             </div>
         </div> -->
 
-        <!-- Footer Bottom -->
-        <div class="footer-bottom animate-on-scroll" @fadeInUp>
-            <div class="social-icons">
-                <a *ngFor="let social of socialLinks" [href]="social.url" [attr.aria-label]="social.label"
-                    class="social-icon">
-                    <i [class]="social.icon"></i>
-                </a>
-            </div>
-            <div class="copyright">
-                <p>&copy; {{ currentYear }} {{userDeatils.name}} All rights reserved.</p>
-                <p>Developer: Vinay Ashija (+91 94165 09833), Mohit Soni (+91 89296 36027) </p>
-                <p class="disclaimer">
-                    The content and images used on this site are copyright protected and copyrights vests with the
-                    respective owners.
-                    The usage of the content and images on this website is intended to promote the works and no
-                    endorsement of the
-                    artist shall be implied. Unauthorized use is prohibited and punishable by law.
-                </p>
-            </div>
-        </div>
+    <!-- Footer Bottom -->
+    <div class="footer-bottom animate-on-scroll" @fadeInUp>
+      <!-- <div class="social-icons">
+        <a *ngFor="let social of socialLinks" [href]="social.url" [attr.aria-label]="social.label" class="social-icon">
+          <i [class]="social.icon"></i>
+        </a>
+      </div> -->
+      <div class="copyright">
+        <p>&copy; {{ currentYear }} {{userDeatils.name}} All rights reserved.</p>
+        <!-- <p>Developer: Vinay Ashija (+91 94165 09833), Mohit Soni (+91 89296 36027) </p>
+        <p class="disclaimer">
+          The content and images used on this site are copyright protected and copyrights vests with the
+          respective owners.
+          The usage of the content and images on this website is intended to promote the works and no
+          endorsement of the
+          artist shall be implied. Unauthorized use is prohibited and punishable by law.
+        </p> -->
+      </div>
     </div>
+  </div>
 </footer>
