@@ -34,6 +34,7 @@ import {
 import { EnquiryModalComponent } from '../../shared/enquiry-modal/enquiry-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SeoService } from '../../service/seo/seo.service';
+import { TourPromoComponent } from "../../shared/tour-promo/tour-promo.component";
 
 @Component({
   selector: 'app-tour',
@@ -52,7 +53,8 @@ import { SeoService } from '../../service/seo/seo.service';
     CallButtonComponent,
     TourPackageComponent,
     EnquiryModalComponent,
-  ],
+    TourPromoComponent
+],
   templateUrl: './tour.component.html',
   styleUrl: './tour.component.css',
   animations: [

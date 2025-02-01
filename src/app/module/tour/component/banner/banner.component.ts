@@ -9,7 +9,12 @@ import {
   trigger,
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  Input,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -28,7 +33,7 @@ import { QueryService } from '../../../../service/query/query.service';
       [style.background-image]="'url(' + backgroundImage + ')'"
       [@bannerState]="animationState"
     >
-      <div [@overlayReveal]="animationState">
+      <div class="glass-overlay" [@overlayReveal]="animationState">
         <div class="query-form-wrapper" [@formEntry]="formFields.length">
           <div class="glass-form">
             <form
@@ -44,7 +49,7 @@ import { QueryService } from '../../../../service/query/query.service';
                   [class.has-error]="isFieldInvalid(field.name)"
                 >
                   <div class="input-wrapper">
-                    <i [ngClass]="field.icon"></i>
+                    <i [class]="field.icon"></i>
                     <input
                       [type]="field.type"
                       [formControlName]="field.name"
@@ -63,6 +68,29 @@ import { QueryService } from '../../../../service/query/query.service';
                 </div>
               </div>
 
+              <!-- Consent Checkbox -->
+              <div class="consent-wrapper" [@consentAnimation]>
+                <label class="custom-checkbox">
+                  <input
+                    type="checkbox"
+                    formControlName="consent"
+                    (change)="onConsentChange($event)"
+                  />
+                  <span class="checkmark"></span>
+                  <span class="consent-text"
+                    >I agree to be contacted by Journey Bees.</span
+                  >
+                </label>
+                <div
+                  *ngIf="isFieldInvalid('consent')"
+                  class="error-message"
+                  [@errorAnimation]
+                >
+                  Please accept the terms to continue
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
               <div
                 class="action-buttons"
                 [@actionButtonsAnimation]="animationState"
@@ -71,16 +99,24 @@ import { QueryService } from '../../../../service/query/query.service';
                   [href]="'tel:' + contactPhone"
                   class="call-btn"
                   aria-label="Call"
-                  [@buttonHover]
+                  [@buttonHover]="buttonState"
+                  (mouseenter)="buttonState = 'hover'"
+                  (mouseleave)="buttonState = 'default'"
                 >
                   <i class="ri-phone-line"></i>
                 </a>
                 <button
                   type="submit"
-                  [disabled]="queryForm.invalid"
+                  [disabled]="queryForm.invalid || isLoading"
                   [@buttonAnimation]="queryForm.status"
+                  class="submit-button"
                 >
-                  {{ ctaText }}
+                  <ng-container *ngIf="!isLoading; else loadingTemplate">
+                    {{ ctaText }}
+                  </ng-container>
+                  <ng-template #loadingTemplate>
+                    <div class="loader"></div>
+                  </ng-template>
                 </button>
               </div>
             </form>
@@ -260,6 +296,15 @@ import { QueryService } from '../../../../service/query/query.service';
         ),
       ]),
     ]),
+    trigger('consentAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate(
+          '300ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        ),
+      ]),
+    ]),
   ],
 })
 export class BannerComponent {
@@ -270,7 +315,8 @@ export class BannerComponent {
   @Input() contactPhone: string = '123-456-7890';
   @Input() ctaText: string = 'Get a Callback';
   animationState = 'default';
-
+  buttonState = 'default';
+  isLoading = false;
   onInputFocus() {
     this.animationState = 'focus';
   }
@@ -327,6 +373,9 @@ export class BannerComponent {
       formControls[field.name] = ['', field.validation || []];
     });
 
+    // Add consent control
+    formControls['consent'] = [true, Validators.requiredTrue];
+
     return this.fb.group(formControls);
   }
 
@@ -364,25 +413,36 @@ export class BannerComponent {
     const field = this.formFields.find((f) => f.name === fieldName);
     return field ? field.placeholder : fieldName;
   }
-
   onSubmit() {
     if (this.queryForm.valid) {
+      this.isLoading = true;
+
       this.queryService.sendQuery(this.queryForm.value).subscribe({
         next: (response) => {
           if (response.success) {
-            window.location.href = 'https://journeybees.in/thank-you.html';
+            window.location.href = 'https://journeybees.in/page/thank-you';
           }
         },
         error: (error) => {
           console.error('Error submitting query:', error);
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
         },
       });
     } else {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.queryForm.controls).forEach((field) => {
-        const control = this.queryForm.get(field);
+      Object.keys(this.queryForm.controls).forEach((key) => {
+        const control = this.queryForm.get(key);
         control?.markAsTouched();
       });
+    }
+  }
+
+  onConsentChange(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.queryForm.get('consent')?.markAsTouched();
     }
   }
 }

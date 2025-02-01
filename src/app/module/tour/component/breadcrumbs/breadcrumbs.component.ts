@@ -24,6 +24,7 @@ import {
 } from '../../../../service/common/common.service';
 import { QueryService } from '../../../../service/query/query.service';
 import { SliderTour } from '../../../../service/tour/tour.service';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 // Register Swiper custom elements
 register();
@@ -45,6 +46,20 @@ export interface TourPackage {
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './breadcrumbs.component.html',
   styleUrl: './breadcrumbs.component.css',
+  animations: [
+      trigger('fadeInOut', [
+        transition(':enter', [
+          style({ opacity: 0, transform: 'scale(0.95)' }),
+          animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
+        ]),
+        transition(':leave', [
+          animate(
+            '200ms ease-in',
+            style({ opacity: 0, transform: 'scale(0.95)' })
+          ),
+        ]),
+      ]),
+    ],
 })
 export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;
@@ -53,6 +68,31 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
   userDeatils: UserDetails;
 
   @Input() packages: SliderTour[] = [];
+  isLoading = false;
+
+  formFields = [
+    {
+      name: 'name',
+      type: 'text',
+      placeholder: 'Your Name',
+      icon: 'ri-user-line',
+      validation: [Validators.required, Validators.minLength(3)],
+    },
+    {
+      name: 'email',
+      type: 'email',
+      placeholder: 'Email',
+      icon: 'ri-mail-line',
+      validation: [Validators.required, Validators.email],
+    },
+    {
+      name: 'phone',
+      type: 'tel',
+      placeholder: 'Contact Number',
+      icon: 'ri-phone-line',
+      validation: [Validators.required, Validators.pattern('^[0-9]{10}$')],
+    },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -142,25 +182,77 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onSubmit(): void {
     if (this.queryForm.valid) {
+      this.isLoading = true;
+
       this.queryService.sendQuery(this.queryForm.value).subscribe({
         next: (response) => {
           if (response.success) {
-            window.location.href = 'https://journeybees.in/thank-you.html';
+            window.location.href = 'https://journeybees.in/page/thank-you';
           }
         },
         error: (error) => {
           console.error('Error submitting query:', error);
+          this.isLoading = false;
         },
+        complete: () => {
+          this.isLoading = false;
+        },
+      });
+    } else {
+      Object.keys(this.queryForm.controls).forEach((key) => {
+        const control = this.queryForm.get(key);
+        control?.markAsTouched();
       });
     }
   }
 
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.queryForm.get(fieldName);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.queryForm.get(fieldName);
+
+    if (control?.hasError('required')) {
+      return `${this.getFieldLabel(fieldName)} is required`;
+    }
+    if (control?.hasError('email')) {
+      return 'Please enter a valid email address';
+    }
+    if (control?.hasError('pattern')) {
+      return 'Please enter a valid 10-digit phone number';
+    }
+    if (control?.hasError('minlength')) {
+      return `${this.getFieldLabel(fieldName)} is too short`;
+    }
+
+    return 'Invalid input';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const field = this.formFields.find((f) => f.name === fieldName);
+    return field ? field.placeholder : fieldName;
+  }
+
   private initForm(): FormGroup {
-    return this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+    const formControls: { [key: string]: any } = {};
+
+    this.formFields.forEach((field) => {
+      formControls[field.name] = ['', field.validation || []];
     });
+
+    // Add consent control
+    formControls['consent'] = [true, Validators.requiredTrue];
+
+    return this.fb.group(formControls);
+  }
+
+  onConsentChange(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.queryForm.get('consent')?.markAsTouched();
+    }
   }
 
   ngOnDestroy(): void {

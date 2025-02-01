@@ -15956,8 +15956,8 @@ input[type=number] {
 
 /* Custom backdrop style for glassmorphism effect */
 .modal-backdrop.show {
-  opacity: 0.85;
-  background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+  opacity: 1;
+  background: #00000094;
 }
 
 /* Glass effect utilities */
@@ -16066,4 +16066,10 @@ input[type=number] {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
+}
+
+.animated-modal .modal-content {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }

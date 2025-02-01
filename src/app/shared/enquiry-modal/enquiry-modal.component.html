@@ -1,41 +1,38 @@
-<div class="modal fade" id="enquiryModal" #enquiryModal tabindex="-1" aria-labelledby="enquiryModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="enquiryModalLabel">Journey Bees</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+<ng-template #content let-modal>
+  <div class="modal-container" [@fadeInOut]>
+    <div class="modal-content-wrapper">
+      <div class="modal-header">
+        <h5 class="modal-title">Have a question? Enter your details</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"> <i class="ri-close-line"></i></button>
       </div>
-      <div class="modal-body p-4">
-        <form (ngSubmit)="onSubmit()" class="space-y-4">
-          <!-- Full Name -->
+
+      <div class="modal-body">
+        <form (ngSubmit)="onSubmit()" class="form-container">
           <div class="form-group">
-            <label for="fullName" class="form-label">Full Name*</label>
-            <input type="text" [(ngModel)]="enquiryForm.name" name="fullName" id="fullName" class="form-control"
-              placeholder="Enter your full name" required />
+            <label for="name">Given Name</label>
+            <input type="text" id="name" name="name" [(ngModel)]="enquiryForm.name" class="form-control" required>
           </div>
 
-          <!-- Email -->
           <div class="form-group">
-            <label for="email" class="form-label">Email*</label>
-            <input type="email" [(ngModel)]="enquiryForm.email" name="email" id="email" class="form-control"
-              placeholder="Enter your email" required />
-          </div>
-
-          <!-- Phone Number -->
-          <div class="form-group">
-            <label for="phone" class="form-label">Phone Number*</label>
-            <div class="input-group">
-              <input type="tel" [(ngModel)]="enquiryForm.phone" name="phone" id="phone" class="form-control"
-                placeholder="Enter your phone number" required />
+            <label for="phone">Enter your mobile number</label>
+            <div class="phone-input">
+              <div class="country-code">
+                <span>+91</span>
+              </div>
+              <input type="tel" id="phone" name="phone" [(ngModel)]="enquiryForm.phone" class="form-control" required>
             </div>
           </div>
-          <!-- Submit Button -->
-          <button type="submit" class="submit-btn w-full bg-orange-500 text-white py-3 rounded">
-            Connect With An Expert
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="Please enter your email" [(ngModel)]="enquiryForm.email" class="form-control" required>
+          </div>
+
+          <button type="submit" class="submit-button">
+            Request callback
           </button>
         </form>
       </div>
     </div>
   </div>
-</div>
+</ng-template>

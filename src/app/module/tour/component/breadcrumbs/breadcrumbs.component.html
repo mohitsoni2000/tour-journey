@@ -45,29 +45,41 @@
             </div>
 
             <form [formGroup]="queryForm" (ngSubmit)="onSubmit()">
-                <div class="form-field">
-                    <i class="ri-user-line"></i>
-                    <input type="text" formControlName="name" placeholder="Your Name"
-                        [class.invalid]="queryForm.get('name')?.invalid && queryForm.get('name')?.touched">
+                <div class="form-fields">
+                    <div class="form-field" *ngFor="let field of formFields">
+                        <div class="input-wrapper">
+                            <i [class]="field.icon"></i>
+                            <input [type]="field.type" [formControlName]="field.name" [placeholder]="field.placeholder"
+                                [class.invalid]="isFieldInvalid(field.name)" />
+                        </div>
+                        <div *ngIf="isFieldInvalid(field.name)" class="error-message" [@errorAnimation]>
+                            {{ getErrorMessage(field.name) }}
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-field">
-                    <i class="ri-mail-line"></i>
-                    <input type="email" formControlName="email" placeholder="Email"
-                        [class.invalid]="queryForm.get('email')?.invalid && queryForm.get('email')?.touched">
+                <div class="consent-wrapper" [@fadeInOut]>
+                    <label class="custom-checkbox">
+                        <input type="checkbox" formControlName="consent" (change)="onConsentChange($event)" />
+                        <span class="checkmark"></span>
+                        <span class="consent-text">I agree to be contacted by Journey Bees.</span>
+                    </label>
+                    <div *ngIf="isFieldInvalid('consent')" class="error-message" [@errorAnimation]>
+                        Please accept the terms to continue
+                    </div>
                 </div>
 
-                <div class="form-field">
-                    <i class="ri-phone-line"></i>
-                    <input type="tel" formControlName="phone" placeholder="Contact Number"
-                        [class.invalid]="queryForm.get('phone')?.invalid && queryForm.get('phone')?.touched">
-                </div>
                 <div class="action-buttons">
-                    <a href="tel:{{userDeatils.phone}}" class="call-btn">
+                    <a [href]="'tel:' + userDeatils.phone" class="call-btn">
                         <i class="ri-phone-line"></i>
                     </a>
-                    <button type="submit" [disabled]="queryForm.invalid">
-                        Get a Callback
+                    <button type="submit" [disabled]="queryForm.invalid || isLoading" class="submit-button">
+                        <ng-container *ngIf="!isLoading; else loadingTemplate">
+                            Get a Callback
+                        </ng-container>
+                        <ng-template #loadingTemplate>
+                            <div class="loader"></div>
+                        </ng-template>
                     </button>
                 </div>
             </form>

@@ -14,6 +14,7 @@ import {
   RouterModule,
 } from '@angular/router';
 import { filter, finalize } from 'rxjs';
+import { HeaderService } from '../../service/header/header.service';
 
 interface FooterSection {
   title: string;
@@ -103,6 +104,7 @@ export class FooterComponent implements OnInit {
   constructor(
     private commonService: CommonService,
     private footerService: FooterService,
+    private headerService: HeaderService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -133,27 +135,20 @@ export class FooterComponent implements OnInit {
 
   private loadDestinations() {
     this.isLoading = true;
-    this.route.params.subscribe((params) => {
-      const tourName = params['name'];
-      if (tourName) {
-        this.footerService
-          .getDestination(tourName)
-          .pipe(finalize(() => (this.isLoading = false)))
-          .subscribe({
-            next: (response: any) => {
-              if (response?.success && response?.data) {
-                this.processDestinationData(response.data);
-              }
-            },
-            error: (error) => {
-              console.error('Error loading destinations:', error);
-              this.isLoading = false;
-            },
-          });
-      } else {
-        this.isLoading = false;
-      }
-    });
+    this.headerService
+      .fetchLocations()
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (response: any) => {
+          if (response?.success && response?.data) {
+            this.processDestinationData(response.data);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading destinations:', error);
+          this.isLoading = false;
+        },
+      });
   }
 
   private processDestinationData(data: any[]) {
@@ -166,7 +161,8 @@ export class FooterComponent implements OnInit {
         url: `${item.slug}`,
         overlayText: `Explore ${item.name}`,
       }))
-      .slice(0, 12); // Limit to 6 destinations
+      .slice(0, 15); // Limit to 6 destinations
+
   }
 
   private initializeAnimations() {

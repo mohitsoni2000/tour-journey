@@ -23,7 +23,7 @@
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.05)
+    rgb(0 0 0 / 48%)
   );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -52,12 +52,12 @@
 
 .search-input-group:focus-within {
   background: rgba(255, 255, 255, 0.15);
-  border-color: var(--primary-color);
+  border-color: var(--white);
   box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
 }
 
 .search-icon {
-  color: var(--primary-color);
+  color: var(--white);
   font-size: 1.25rem;
   opacity: 0.7;
   margin-right: 0.5rem;
@@ -227,7 +227,7 @@
   .glass-modal {
     max-width: 720px;
   }
-  
+
   .location-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -294,13 +294,7 @@
   transition: opacity 300ms, transform 300ms;
 }
 
-/* Focus States for Accessibility */
-.search-input:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary-color);
-}
-
 .location-card:focus-visible {
-  outline: 2px solid var(--primary-color);
+  outline: 2px solid var(--white);
   outline-offset: 2px;
 }

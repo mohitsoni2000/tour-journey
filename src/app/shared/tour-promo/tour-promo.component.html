@@ -1,0 +1,95 @@
+<ng-template #promoModal let-modal>
+    <div class="modal-container" [@fadeInOut]>
+        <div class="modal-content-wrapper">
+            <div class="modal-header">
+                <div class="logo">
+                    <img width="100" src="assets/images/logo/small-logo.png" alt="Journey Bees Logo">
+                </div>
+                <div class="header-content">
+                    <div class="offer-badge">Limited Time Offer!</div>
+                    <h5 class="modal-title">Discover Your Dream Vacation</h5>
+                    <p class="subtitle">Get exclusive deals on top destinations</p>
+                </div>
+                <button type="button" class="close-button" aria-label="Close" (click)="modal.dismiss()">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="promo-content">
+                    <div class="offer-details">
+                        <div class="service-item">
+                            <div class="service-icon">
+                                <i class="ri-wallet-3-line"></i>
+                            </div>
+                            <h6 class="service-title">No Hidden Costs</h6>
+                        </div>
+
+                        <div class="service-item">
+                            <div class="service-icon">
+                                <i class="ri-customer-service-2-line"></i>
+                            </div>
+                            <h6 class="service-title">24/7 Customer Care</h6>
+                        </div>
+
+                        <div class="service-item">
+                            <div class="service-icon">
+                                <i class="ri-route-line"></i>
+                            </div>
+                            <h6 class="service-title">100% Customized Trips</h6>
+                        </div>
+                    </div>
+
+                    <form (ngSubmit)="onSubmit()" class="form-container">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" placeholder="Please enter your name"
+                                [(ngModel)]="enquiryForm.name" class="form-control"
+                                [class.invalid]="submitted && !enquiryForm.name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Contact Number</label>
+                            <div class="phone-input">
+                                <div class="country-code">
+                                    <span>+91</span>
+                                </div>
+                                <input type="tel" id="phone" name="phone" placeholder="Please enter your phone"
+                                    [(ngModel)]="enquiryForm.phone" class="form-control"
+                                    [class.invalid]="submitted && !enquiryForm.phone" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="Please enter your email"
+                                [(ngModel)]="enquiryForm.email" class="form-control"
+                                [class.invalid]="submitted && !enquiryForm.email" required>
+                        </div>
+
+                        <div class="form-group consent-group">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" name="consent" [(ngModel)]="enquiryForm.consent" required>
+                                <span class="checkmark"></span>
+                                <span class="consent-text">I agree to be contacted by Journey Bees</span>
+                            </label>
+                            <div class="error-message" *ngIf="submitted && !enquiryForm.consent">
+                                Please accept the terms to continue
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button" [disabled]="isLoading">
+                            <ng-container *ngIf="!isLoading; else loadingTemplate">
+                                <span>Get Your Exclusive Offer</span>
+                                <div class="button-shine"></div>
+                            </ng-container>
+                            <ng-template #loadingTemplate>
+                                <div class="loader"></div>
+                            </ng-template>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
