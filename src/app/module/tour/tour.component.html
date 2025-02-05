@@ -10,25 +10,25 @@
                     <div class="all-tour-list">
                         <div class="row g-4">
                             @if (toursWithBanner$ | async; as items) {
-                                @for (item of items; track $index) {
-                                    @if (item.type === 'tour') {
-                                        <div class="col-xl-4 col-lg-4 col-sm-6" [@cardAnimation]="'in'"
-                                            [style.animation-delay]="$index * 0.1 + 's'">
-                                            <app-tour-card [tour]="item.data" [phoneNumber]="userDetails.phone"
-                                                (enquiryModalVisibleChange)="openEnquiryModal()" />
-                                        </div>
-                                    } @else {
-                                        <div class="col-12 my-4" [@bannerAnimation]>
-                                            <app-banner />
-                                        </div>
-                                    }
-                                }
+                            @for (item of items; track $index) {
+                            @if (item.type === 'tour') {
+                            <div class="col-xl-4 col-lg-4 col-sm-6" [@cardAnimation]="'in'"
+                                [style.animation-delay]="$index * 0.1 + 's'">
+                                <app-tour-card [tour]="item.data" [phoneNumber]="userDetails.phone"
+                                    (enquiryModalVisibleChange)="openEnquiryModal($event)" />
+                            </div>
                             } @else {
-                                @for (_ of [1,2,3,4,5,6]; track $index) {
-                                    <div class="col-xl-4 col-lg-4 col-sm-6">
-                                        <app-tour-card-skeleton />
-                                    </div>
-                                }
+                            <div class="col-12 my-4" [@bannerAnimation]>
+                                <app-banner />
+                            </div>
+                            }
+                            }
+                            } @else {
+                            @for (_ of [1,2,3,4,5,6]; track $index) {
+                            <div class="col-xl-4 col-lg-4 col-sm-6">
+                                <app-tour-card-skeleton />
+                            </div>
+                            }
                             }
                         </div>
                     </div>
@@ -42,5 +42,4 @@
     <app-call-button [phoneNumber]="userDetails.phone" (callRequested)="handleCallRequest()"></app-call-button>
 </main>
 <app-footer></app-footer>
-<app-enquiry-modal #enquiryModal></app-enquiry-modal>
-<app-tour-promo></app-tour-promo>
+<app-tour-promo #enquiryModal></app-tour-promo>

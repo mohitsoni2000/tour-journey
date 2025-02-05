@@ -54,7 +54,7 @@ import { TransformedTour } from '../../../../service/tour/tour.service';
 export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() tour!: TransformedTour;
   @Input() phoneNumber: string = '';
-  @Output() enquiryModalVisibleChange = new EventEmitter<boolean>();
+  @Output() enquiryModalVisibleChange = new EventEmitter<string>();
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;
   @ViewChild('tourTitle') tourTitle!: ElementRef;
@@ -205,8 +205,8 @@ export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  openEnquiryModal() {
-    this.enquiryModalVisibleChange.emit(true);
+  openEnquiryModal(message?: string) {
+    this.enquiryModalVisibleChange.emit(message);
   }
 
   // Update the HostListener for document clicks

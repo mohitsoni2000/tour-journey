@@ -18,9 +18,8 @@ import { TourCardComponent } from './component/tour-card/tour-card.component';
 import { TourPackageComponent } from './component/tour-package/tour-package.component';
 import { WhatsappButtonComponent } from './component/whatsapp-button/whatsapp-button.component';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Meta, Title } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, catchError, filter, map, of, tap } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { Observable, filter, map, tap } from 'rxjs';
 import {
   Banner,
   SliderTour,
@@ -31,10 +30,9 @@ import {
   CommonService,
   UserDetails,
 } from '../../service/common/common.service';
-import { EnquiryModalComponent } from '../../shared/enquiry-modal/enquiry-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SeoService } from '../../service/seo/seo.service';
-import { TourPromoComponent } from "../../shared/tour-promo/tour-promo.component";
+import { TourPromoComponent } from '../../shared/tour-promo/tour-promo.component';
 
 @Component({
   selector: 'app-tour',
@@ -52,9 +50,8 @@ import { TourPromoComponent } from "../../shared/tour-promo/tour-promo.component
     WhatsappButtonComponent,
     CallButtonComponent,
     TourPackageComponent,
-    EnquiryModalComponent,
-    TourPromoComponent
-],
+    TourPromoComponent,
+  ],
   templateUrl: './tour.component.html',
   styleUrl: './tour.component.css',
   animations: [
@@ -82,7 +79,7 @@ import { TourPromoComponent } from "../../shared/tour-promo/tour-promo.component
   ],
 })
 export class TourComponent implements OnDestroy {
-  @ViewChild('enquiryModal') enquiryModal!: EnquiryModalComponent;
+  @ViewChild('enquiryModal') enquiryModal!: TourPromoComponent;
   private destroyRef = inject(DestroyRef);
 
   private tourService = inject(TourService);
@@ -92,8 +89,6 @@ export class TourComponent implements OnDestroy {
   sliderTours$: Observable<SliderTour[]> | undefined;
 
   constructor(
-    private meta: Meta,
-    private title: Title,
     private commonService: CommonService,
     private seoService: SeoService
   ) {
@@ -156,8 +151,8 @@ export class TourComponent implements OnDestroy {
     return result;
   }
 
-  openEnquiryModal() {
-    this.enquiryModal.openEnquiryModal();
+  openEnquiryModal(message?: string) {
+    this.enquiryModal.openPromoModal(message);
   }
 
   handleCallRequest() {

@@ -40,7 +40,6 @@ export class EnquiryModalComponent {
     private queryService: QueryService
   ) {}
 
-  ngOnInit() {}
 
   openEnquiryModal() {
     this.modalService.open(this.content, {

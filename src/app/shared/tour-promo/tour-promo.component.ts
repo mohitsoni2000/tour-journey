@@ -32,6 +32,7 @@ export class TourPromoComponent implements OnInit {
     email: '',
     phone: '',
     destination: '',
+    note: 'Enquiry from website',
     consent: true,
   };
 
@@ -74,9 +75,10 @@ export class TourPromoComponent implements OnInit {
     }
   }
 
-  openPromoModal() {
+  openPromoModal(message?: string) {
     if (!this.isModalOpen) {
       this.isModalOpen = true;
+      this.enquiryForm.note = message || 'Enquiry from website';
       const modalRef = this.modalService.open(this.promoModal, {
         centered: true,
         backdrop: 'static',
@@ -85,6 +87,7 @@ export class TourPromoComponent implements OnInit {
 
       modalRef.result.finally(() => {
         this.isModalOpen = false;
+        this.enquiryForm.note = 'Enquiry from website';
       });
     }
   }

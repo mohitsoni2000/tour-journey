@@ -1,6 +1,6 @@
 <!-- tour-card.component.html -->
 <div class="package-card animate__animated animate__fadeInUp">
-    <div class="package-img">
+    <div class="package-img" (click)="openEnquiryModal()">
         <div class="gradient-overlay"></div>
         <swiper-container #swiperContainer init="false">
             @for (image of tour.images; track $index) {
@@ -75,7 +75,7 @@
             <a class="call-btn" [href]="'tel:' + phoneNumber">
                 <i class="ri-phone-line"></i>
             </a>
-            <button class="request-btn" (click)="openEnquiryModal()">
+            <button class="request-btn" (click)="openEnquiryModal(tour.title + ' - ' + tour.location)">
                 Request Callback
             </button>
         </div>
