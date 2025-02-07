@@ -1,9 +1,11 @@
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QueryService } from '../../service/query/query.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tour-promo',
@@ -36,12 +38,25 @@ export class TourPromoComponent implements OnInit {
     consent: true,
   };
 
+  clearForm() {
+    this.enquiryForm = {
+      name: '',
+      email: '',
+      phone: '',
+      destination: '',
+      note: 'Enquiry from website',
+      consent: true,
+    };
+  }
+
   @ViewChild('promoModal') promoModal: any;
   private modalDisplayInterval: any;
   isLoading = false;
   submitted = false;
   private isModalOpen = false;
-
+  private route = inject(ActivatedRoute);
+  private routeSub: Subscription | undefined;
+  private defaultMessages = 'Enquiry from website';
   constructor(
     private modalService: NgbModal,
     private queryService: QueryService
@@ -49,6 +64,11 @@ export class TourPromoComponent implements OnInit {
 
   ngOnInit() {
     this.startModalInterval();
+    if (this.routeSub) this.routeSub.unsubscribe();
+    this.routeSub = this.route.params.subscribe((params) => {
+      const tourName = params['name'];
+      if (tourName) this.defaultMessages = `Enquiry for ${tourName}`;
+    });
   }
 
   ngOnDestroy() {
@@ -78,7 +98,7 @@ export class TourPromoComponent implements OnInit {
   openPromoModal(message?: string) {
     if (!this.isModalOpen) {
       this.isModalOpen = true;
-      this.enquiryForm.note = message || 'Enquiry from website';
+      this.enquiryForm.note = message || this.defaultMessages;
       const modalRef = this.modalService.open(this.promoModal, {
         centered: true,
         backdrop: 'static',
@@ -101,8 +121,11 @@ export class TourPromoComponent implements OnInit {
       this.queryService.sendQuery(this.enquiryForm).subscribe({
         next: (response) => {
           if (response.success) {
+            this.submitted = false;
+            this.isLoading = false;
             this.modalService.dismissAll();
             window.location.href = 'https://journeybees.in/page/thank-you';
+            this.clearForm();
           }
         },
         error: (error) => {
