@@ -200,7 +200,7 @@
   /* Safe area adjustments for modern mobile devices */
   @supports (padding: max(0px)) {
     .whatsapp-container {
-      bottom: max(100px, env(safe-area-inset-bottom) + 70px);
+      bottom: max(140px, env(safe-area-inset-bottom) + 70px);
       right: max(20px, env(safe-area-inset-right) + 10px);
     }
   }

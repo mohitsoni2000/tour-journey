@@ -103,6 +103,7 @@ export class TourPromoComponent implements OnInit {
         centered: true,
         backdrop: 'static',
         windowClass: 'animated-modal',
+        size: 'xl'
       });
 
       modalRef.result.finally(() => {

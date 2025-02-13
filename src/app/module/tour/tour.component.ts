@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   DestroyRef,
+  HostListener,
   inject,
   OnDestroy,
   ViewChild,
@@ -18,7 +19,7 @@ import { TourCardComponent } from './component/tour-card/tour-card.component';
 import { TourPackageComponent } from './component/tour-package/tour-package.component';
 import { WhatsappButtonComponent } from './component/whatsapp-button/whatsapp-button.component';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Observable, filter, map, tap } from 'rxjs';
 import {
   Banner,
@@ -87,13 +88,17 @@ export class TourComponent implements OnDestroy {
   toursWithBanner$!: Observable<Array<{ type: 'tour' | 'banner'; data: any }>>;
   userDetails: UserDetails;
   sliderTours$: Observable<SliderTour[]> | undefined;
-
+  showScrollButton = false;
+  circumference = 2 * Math.PI * 15.9155; // Circle circumference
+  dashOffset = this.circumference;
+  private router = inject(Router);
   constructor(
     private commonService: CommonService,
     private seoService: SeoService
   ) {
     this.userDetails = this.commonService.getUserDetails();
     this.initializeData();
+    this.setupScrollToTop();
   }
 
   private initializeData() {
@@ -161,5 +166,32 @@ export class TourComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.seoService.removeAllMeta();
+  }
+  private setupScrollToTop() {
+    // Listen for route changes
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    // Show button after 300px of scroll
+    this.showScrollButton = window.scrollY > 300;
+
+    // Calculate scroll progress
+    const windowHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const scrolled = Math.min(window.scrollY / windowHeight, 1);
+    this.dashOffset = this.circumference * (1 - scrolled);
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

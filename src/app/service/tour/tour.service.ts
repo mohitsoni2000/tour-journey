@@ -30,6 +30,8 @@ export interface Tour {
   image_file_path: string;
   banner_image_path: string;
   is_featured: number;
+  min_people: number;
+  max_people: number;
   gallery: string | null;
   location_id: number;
   include: string;
@@ -60,6 +62,8 @@ export interface TransformedTour {
   cities: string[];
   highlights: string[];
   description: string;
+  minPersons: number;
+  maxPersons: number;
   content: string;
 }
 
@@ -164,6 +168,8 @@ export class TourService {
       salePrice: parseFloat(tour.sale_price),
       images: imageUrls,
       featured: tour.card_tag.trim(),
+      minPersons: tour.min_people,
+      maxPersons: tour.max_people,
       cities: tour?.slider_tag?.split('#').map((item) => item.trim()) ?? [],
       highlights: tour?.highlights?.split('#').map((item) => item.trim()) ?? [],
       description: tour.short_desc,
