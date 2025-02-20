@@ -13,7 +13,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  inject,
   Input,
+  OnDestroy,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -22,6 +24,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { QueryService } from '../../../../service/query/query.service';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-banner',
@@ -307,7 +311,7 @@ import { QueryService } from '../../../../service/query/query.service';
     ]),
   ],
 })
-export class BannerComponent {
+export class BannerComponent implements OnDestroy {
   @Input() backgroundImage: string = 'assets/images/package/package-4.webp';
   @Input() title: string = 'Get a Callback';
   @Input() subtitle: string =
@@ -351,8 +355,17 @@ export class BannerComponent {
     },
   ];
 
+  private route = inject(ActivatedRoute);
+  private routeSub: Subscription | undefined;
+  private defaultMessages = 'Enquiry from website';
+
   constructor(private fb: FormBuilder, private queryService: QueryService) {
     this.queryForm = this.createForm();
+
+    this.routeSub = this.route.params.subscribe((params) => {
+      const tourName = params['name'];
+      if (tourName) this.defaultMessages = `Enquiry for ${tourName}`;
+    });
   }
 
   @HostListener('window:resize')
@@ -416,11 +429,16 @@ export class BannerComponent {
   onSubmit() {
     if (this.queryForm.valid) {
       this.isLoading = true;
+      const queryData = {
+        ...this.queryForm.value,
+        note: this.defaultMessages,
+        url: window.location.href,
+      };
 
-      this.queryService.sendQuery(this.queryForm.value).subscribe({
+      this.queryService.sendQuery(queryData).subscribe({
         next: (response) => {
           if (response.success) {
-            window.location.href = 'https://journeybees.in/page/thank-you';
+            this.queryService.sendMail(queryData);
           }
         },
         error: (error) => {
@@ -443,6 +461,12 @@ export class BannerComponent {
     const checkbox = event.target as HTMLInputElement;
     if (checkbox.checked) {
       this.queryForm.get('consent')?.markAsTouched();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
     }
   }
 }

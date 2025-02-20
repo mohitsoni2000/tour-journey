@@ -16,6 +16,7 @@ import {
   ViewChild,
   OnInit,
   OnDestroy,
+  inject,
 } from '@angular/core';
 import { register } from 'swiper/element/bundle';
 import {
@@ -25,6 +26,8 @@ import {
 import { QueryService } from '../../../../service/query/query.service';
 import { SliderTour } from '../../../../service/tour/tour.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 // Register Swiper custom elements
 register();
@@ -47,19 +50,19 @@ export interface TourPackage {
   templateUrl: './breadcrumbs.component.html',
   styleUrl: './breadcrumbs.component.css',
   animations: [
-      trigger('fadeInOut', [
-        transition(':enter', [
-          style({ opacity: 0, transform: 'scale(0.95)' }),
-          animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
-        ]),
-        transition(':leave', [
-          animate(
-            '200ms ease-in',
-            style({ opacity: 0, transform: 'scale(0.95)' })
-          ),
-        ]),
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.95)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
       ]),
-    ],
+      transition(':leave', [
+        animate(
+          '200ms ease-in',
+          style({ opacity: 0, transform: 'scale(0.95)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;
@@ -94,6 +97,10 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
+  private route = inject(ActivatedRoute);
+  private routeSub: Subscription | undefined;
+  private defaultMessages = 'Enquiry from website';
+
   constructor(
     private fb: FormBuilder,
     private commonService: CommonService,
@@ -101,6 +108,11 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     this.userDeatils = this.commonService.getUserDetails();
     this.queryForm = this.initForm();
+
+    this.routeSub = this.route.params.subscribe((params) => {
+      const tourName = params['name'];
+      if (tourName) this.defaultMessages = `Enquiry for ${tourName}`;
+    });
   }
 
   ngOnInit(): void {
@@ -184,10 +196,16 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.queryForm.valid) {
       this.isLoading = true;
 
-      this.queryService.sendQuery(this.queryForm.value).subscribe({
+      const queryData = {
+        ...this.queryForm.value,
+        note: this.defaultMessages,
+        url: window.location.href,
+      };
+
+      this.queryService.sendQuery(queryData).subscribe({
         next: (response) => {
           if (response.success) {
-            window.location.href = 'https://journeybees.in/page/thank-you';
+            this.queryService.sendMail(queryData);
           }
         },
         error: (error) => {
@@ -258,6 +276,9 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.swiperEl) {
       this.swiperEl.destroy?.();
+    }
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
     }
   }
 }

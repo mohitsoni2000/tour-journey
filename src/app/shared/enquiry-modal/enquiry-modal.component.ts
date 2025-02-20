@@ -54,7 +54,7 @@ export class EnquiryModalComponent {
       next: (response) => {
         if (response.success) {
           this.modalService.dismissAll();
-          window.location.href = 'https://journeybees.in/page/thank-you';
+          this.queryService.sendMail(this.enquiryForm);
         }
       },
       error: (error) => {

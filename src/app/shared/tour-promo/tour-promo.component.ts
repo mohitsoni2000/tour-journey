@@ -35,6 +35,7 @@ export class TourPromoComponent implements OnInit {
     phone: '',
     destination: '',
     note: 'Enquiry from website',
+    url: window.location.href,
     consent: true,
   };
 
@@ -45,6 +46,7 @@ export class TourPromoComponent implements OnInit {
       phone: '',
       destination: '',
       note: 'Enquiry from website',
+      url: window.location.href,
       consent: true,
     };
   }
@@ -119,14 +121,15 @@ export class TourPromoComponent implements OnInit {
     if (this.isFormValid()) {
       this.isLoading = true;
 
+      
       this.queryService.sendQuery(this.enquiryForm).subscribe({
         next: (response) => {
           if (response.success) {
             this.submitted = false;
             this.isLoading = false;
             this.modalService.dismissAll();
-            window.location.href = 'https://journeybees.in/page/thank-you';
             this.clearForm();
+            this.queryService.sendMail(this.enquiryForm);
           }
         },
         error: (error) => {
