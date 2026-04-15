@@ -50,16 +50,16 @@ export class EnquiryModalComponent {
   }
 
   onSubmit() {
-    this.queryService.sendQuery(this.enquiryForm).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.modalService.dismissAll();
-          this.queryService.sendMail(this.enquiryForm);
-        }
-      },
-      error: (error) => {
-        console.error('Error submitting enquiry:', error);
-      },
-    });
+  //   this.queryService.sendQuery(this.enquiryForm).subscribe({
+  //     next: (response) => {
+  //       if (response.success) {
+  //         this.modalService.dismissAll();
+  //         this.queryService.sendMail(this.enquiryForm);
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error submitting enquiry:', error);
+  //     },
+  //   });
   }
 }

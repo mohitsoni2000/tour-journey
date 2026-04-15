@@ -88,7 +88,7 @@ export class TourPromoComponent implements OnInit {
           this.openPromoModal();
         }
       }, 1 * 60 * 1000); // 1 minutes
-    }, 30 * 1000); // 1 minute
+    }, 1 * 60 * 1000); // 1 minute
   }
 
   private stopModalInterval() {

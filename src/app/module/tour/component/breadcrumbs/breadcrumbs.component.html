@@ -75,7 +75,7 @@
                     </a>
                     <button type="submit" [disabled]="queryForm.invalid || isLoading" class="submit-button">
                         <ng-container *ngIf="!isLoading; else loadingTemplate">
-                            Get a Callback
+                            Submit Query
                         </ng-container>
                         <ng-template #loadingTemplate>
                             <div class="loader"></div>

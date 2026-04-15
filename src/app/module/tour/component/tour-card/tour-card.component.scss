@@ -295,8 +295,8 @@ swiper-container {
   padding: 4px 10px;
   border: none;
   border-radius: 16px;
-  background: rgba(var(--secondary-color-rgb), 0.1);
-  color: var(--secondary-color);
+  color: var(--white);
+  background: var(--secondary-color);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -490,7 +490,211 @@ swiper-container {
   }
 }
 
-.per-person-info{
+.per-person-info {
   color: #4b4b4b;
   font-size: 10px;
+}
+
+/* Updated badge styles with fluorescent colors */
+
+/* Option 1: Bright Neon Green */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: #000;
+//   background: rgba(0, 255, 106, 0.8); /* Fluorescent green */
+//   box-shadow: 0 0 10px rgba(0, 255, 106, 0.6); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+// .image-badge:hover {
+//   transform: scale(1.05);
+//   background: rgba(0, 255, 106, 0.9);
+// }
+
+/* Option 2: Electric Pink */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: #fff;
+//   background: rgba(255, 0, 234, 0.8); /* Fluorescent pink */
+//   box-shadow: 0 0 10px rgba(255, 0, 234, 0.5); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+/* Option 3: Bright Yellow */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: #000;
+//   background: rgba(255, 255, 0, 0.85); /* Fluorescent yellow */
+//   box-shadow: 0 0 10px rgba(255, 255, 0, 0.5); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+/* Updated badge styles with fluorescent colors using site variables */
+
+/* Option 1: Fluorescent Orange (based on --secondary-color) */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: white;
+//   background: rgba(255, 87, 34, 0.9); /* Brighter version of --secondary-color */
+//   box-shadow: 0 0 12px rgba(255, 87, 34, 0.7); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+//   backdrop-filter: blur(0); /* Remove blur for fluorescent look */
+// }
+
+// .image-badge:hover {
+//   transform: scale(1.05);
+//   background: rgba(255, 87, 34, 1);
+// }
+
+/* Option 2: Fluorescent Teal (based on --primary-color) */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: white;
+//   background: rgba(1, 200, 175, 0.9); /* Fluorescent version of --primary-color */
+//   box-shadow: 0 0 12px rgba(1, 200, 175, 0.7); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+/* Option 3: Fluorescent Yellow (based on --secondary-btn) */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: #000;
+//   background: rgba(255, 230, 0, 0.95); /* Fluorescent version of --secondary-btn */
+//   box-shadow: 0 0 12px rgba(255, 230, 0, 0.7); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+/* Option 4: Fluorescent Blue (based on --tertiary-color) */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: white;
+//   background: rgba(0, 195, 255, 0.9); /* Fluorescent version of --tertiary-color */
+//   box-shadow: 0 0 12px rgba(0, 195, 255, 0.7); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+/* Option 5: Neon Green (highly fluorescent contrast color) */
+// .image-badge {
+//   position: absolute;
+//   top: 12px;
+//   left: 12px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: #000;
+//   background: rgba(204, 255, 0, 0.95); /* Fluorescent lime green */
+//   box-shadow: 0 0 12px rgba(204, 255, 0, 0.7); /* Glow effect */
+//   z-index: 10;
+//   text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+//   border: 1px solid rgba(255, 255, 255, 0.3);
+//   transition: all 0.3s ease;
+// }
+
+/* Option 6: Variable-Based Option (using CSS variables) */
+.image-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+  background: rgba(var(--secondary-color-rgb), 0.95); 
+  box-shadow: 0 0 12px rgba(var(--secondary-color-rgb), 0.7);
+  z-index: 10;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
 }

@@ -42,7 +42,7 @@
                     [openDelay]="200" [closeDelay]="200" tooltipClass="cities-tooltip" container="body"
                     [disableTooltip]="!isCitiesTruncated" placement="auto" #citiesListTooltip="ngbTooltip">
                     @for (city of tour.cities; track city) {
-                    <span class="city-tag">
+                    <span class="city-tag save-tag">
                         <i class="ri-building-line"></i>
                         {{city}}
                     </span>
