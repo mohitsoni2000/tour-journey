@@ -101,9 +101,9 @@ export class BreadcrumbsComponent implements OnInit, OnChanges, AfterViewInit, O
     {
       name: 'phone',
       type: 'tel',
-      placeholder: 'Contact Number',
+      placeholder: 'Mobile',
       icon: 'ri-phone-line',
-      validation: [Validators.required, Validators.pattern(/^[0-9]{8,}$/)],
+      validation: [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
     },
   ];
 
@@ -257,7 +257,7 @@ export class BreadcrumbsComponent implements OnInit, OnChanges, AfterViewInit, O
       return 'Please enter a valid email address';
     }
     if (control?.hasError('pattern')) {
-      if (fieldName === 'phone') return 'Phone number must contain only digits (min 8)';
+      if (fieldName === 'phone') return 'Enter a valid 10-digit mobile number';
       if (fieldName === 'name') return 'Name can only contain letters and spaces';
       return 'Invalid format';
     }

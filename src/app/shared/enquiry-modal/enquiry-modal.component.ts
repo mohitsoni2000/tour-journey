@@ -43,7 +43,7 @@ export class EnquiryModalComponent {
         Validators.pattern(/^[a-zA-Z\s]+$/),
       ],
     ],
-    phone: ['', [Validators.required, Validators.pattern(/^[0-9]{8,}$/)]],
+    phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
     email: ['', [Validators.required, Validators.email]],
   });
 
@@ -75,7 +75,7 @@ export class EnquiryModalComponent {
     }
     if (control.hasError('pattern')) {
       if (field === 'phone')
-        return 'Phone number must contain only digits (min 8)';
+        return 'Enter a valid 10-digit mobile number';
       if (field === 'name') return 'Name can only contain letters and spaces';
     }
     if (control.hasError('email')) return 'Please enter a valid email address';
