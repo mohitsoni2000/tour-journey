@@ -11,6 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   HostListener,
   inject,
@@ -40,6 +41,16 @@ import { Subscription } from 'rxjs';
       <div class="glass-overlay" [@overlayReveal]="animationState">
         <div class="query-form-wrapper" [@formEntry]="formFields.length">
           <div class="glass-form">
+            <ng-container *ngIf="isSubmitted; else bannerFormTemplate">
+              <div class="success-state">
+                <div class="success-icon">
+                  <i class="ri-checkbox-circle-fill"></i>
+                </div>
+                <h3>Thank You!</h3>
+                <p>Our travel expert will call you back shortly.</p>
+              </div>
+            </ng-container>
+            <ng-template #bannerFormTemplate>
             <form
               [formGroup]="queryForm"
               (ngSubmit)="onSubmit()"
@@ -124,6 +135,7 @@ import { Subscription } from 'rxjs';
                 </button>
               </div>
             </form>
+            </ng-template>
           </div>
         </div>
       </div>
@@ -312,6 +324,7 @@ import { Subscription } from 'rxjs';
   ],
 })
 export class BannerComponent implements OnDestroy {
+  private cdr = inject(ChangeDetectorRef);
   @Input() backgroundImage: string = 'assets/images/package/package-4.webp';
   @Input() title: string = 'Get a Callback';
   @Input() subtitle: string =
@@ -321,6 +334,7 @@ export class BannerComponent implements OnDestroy {
   animationState = 'default';
   buttonState = 'default';
   isLoading = false;
+  isSubmitted = false;
   onInputFocus() {
     this.animationState = 'focus';
   }
@@ -337,7 +351,7 @@ export class BannerComponent implements OnDestroy {
       type: 'text',
       placeholder: 'Your Name',
       icon: 'ri-user-line',
-      validation: [Validators.required, Validators.minLength(2)],
+      validation: [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z\s]+$/)],
     },
     {
       name: 'email',
@@ -351,7 +365,7 @@ export class BannerComponent implements OnDestroy {
       type: 'tel',
       placeholder: 'Contact Number',
       icon: 'ri-phone-line',
-      validation: [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
+      validation: [Validators.required, Validators.pattern(/^[0-9]{8,}$/)],
     },
   ];
 
@@ -410,9 +424,9 @@ export class BannerComponent implements OnDestroy {
     }
 
     if (control?.hasError('pattern')) {
-      return fieldName === 'phone'
-        ? 'Please enter a valid 10-digit phone number'
-        : 'Invalid format';
+      if (fieldName === 'phone') return 'Phone number must contain only digits (min 8)';
+      if (fieldName === 'name') return 'Name can only contain letters and spaces';
+      return 'Invalid format';
     }
 
     if (control?.hasError('minlength')) {
@@ -432,21 +446,27 @@ export class BannerComponent implements OnDestroy {
       const queryData = {
         ...this.queryForm.value,
         note: this.defaultMessages,
-        url: window.location.href,
+        url: window.location.origin + window.location.pathname,
       };
 
       this.queryService.sendQuery(queryData).subscribe({
         next: (response) => {
           if (response.success) {
+            this.isLoading = false;
+            this.isSubmitted = true;
+            this.cdr.markForCheck();
             this.queryService.sendMail(queryData);
+            this.queryForm.reset();
+            this.queryForm.patchValue({ consent: true });
+            setTimeout(() => {
+              this.isSubmitted = false;
+              this.cdr.markForCheck();
+            }, 5000);
           }
         },
-        error: (error) => {
-          console.error('Error submitting query:', error);
+        error: () => {
           this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
     } else {

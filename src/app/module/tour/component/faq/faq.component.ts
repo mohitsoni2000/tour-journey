@@ -8,13 +8,15 @@ import {
   stagger,
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import {
   FAQ,
   FAQResponse,
   FaqService,
 } from '../../../../service/faq/faq.service';
 import { ActivatedRoute } from '@angular/router';
+import { switchMap, of } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-faq',
@@ -90,6 +92,8 @@ export class FaqComponent implements OnInit {
   faqs: FAQ[] = [];
   isLoading = true;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private faqService: FaqService, private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -98,26 +102,29 @@ export class FaqComponent implements OnInit {
 
   private loadFAQs() {
     this.isLoading = true;
-    this.route.params.subscribe((params) => {
-      const tourName = params['name'];
-      if (tourName) {
-        this.faqService.getFAQ(tourName).subscribe({
-          next: (response: FAQResponse) => {
-            if (response?.success && response?.data) {
-              this.faqs = response.data.map((faq) => ({
-                question: faq.faq_question,
-                answer: faq.faq_answer,
-                isOpen: false,
-              }));
-            }
-            this.isLoading = false;
-          },
-          error: (error) => {
-            console.error('Error loading faq:', error);
-            this.isLoading = false;
-          },
-        });
-      }
+    // H6: use switchMap to flatten nested subscriptions — only one active at a time
+    this.route.params.pipe(
+      switchMap((params) => {
+        const tourName = params['name'];
+        if (!tourName) return of({ success: false, data: [] } as FAQResponse);
+        return this.faqService.getFAQ(tourName);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response: FAQResponse) => {
+        if (response?.success && response?.data) {
+          this.faqs = response.data.map((faq) => ({
+            question: faq.faq_question,
+            answer: faq.faq_answer,
+            isOpen: false,
+          }));
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading faq:', error);
+        this.isLoading = false;
+      },
     });
   }
 

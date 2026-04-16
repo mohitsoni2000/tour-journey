@@ -15,7 +15,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   BehaviorSubject,
@@ -26,6 +26,7 @@ import {
   map,
   Observable,
   startWith,
+  take,
 } from 'rxjs';
 
 interface Location {
@@ -132,9 +133,10 @@ export class LocationSearchComponent implements OnInit {
     }, 100);
   }
 
+  // H1: use take(1) to avoid accumulating subscriptions on every keypress
   onArrowDown() {
     this.filteredLocations$
-      .pipe(map((locations) => locations.length))
+      .pipe(map((locations) => locations.length), take(1))
       .subscribe((length) => {
         if (length > 0) {
           this.selectedIndex = (this.selectedIndex + 1) % length;
@@ -144,7 +146,7 @@ export class LocationSearchComponent implements OnInit {
 
   onArrowUp() {
     this.filteredLocations$
-      .pipe(map((locations) => locations.length))
+      .pipe(map((locations) => locations.length), take(1))
       .subscribe((length) => {
         if (length > 0) {
           this.selectedIndex =
@@ -154,7 +156,7 @@ export class LocationSearchComponent implements OnInit {
   }
 
   onEnter() {
-    this.filteredLocations$.subscribe((locations) => {
+    this.filteredLocations$.pipe(take(1)).subscribe((locations) => {
       if (locations.length > 0 && this.selectedIndex >= 0) {
         this.selectLocation(locations[this.selectedIndex]);
       }
@@ -163,18 +165,9 @@ export class LocationSearchComponent implements OnInit {
 
   selectLocation(location: any) {
     this.activeModal.close(location);
-    
-    // Navigate to new route
-    this.router.navigate(['/tour', location.slug], {
-      skipLocationChange: false,
-      replaceUrl: false
-    }).then(() => {
-      // Force route refresh by subscribing to NavigationEnd
-      this.router.events.pipe(
-        filter(event => event instanceof NavigationEnd)
-      ).subscribe(() => {
-        window.scrollTo(0, 0); // Scroll to top after navigation
-      });
+    // H2: navigate().then() fires when navigation completes — no router.events subscription needed
+    this.router.navigate(['/tour', location.slug]).then(() => {
+      window.scrollTo(0, 0);
     });
   }
 }

@@ -3,16 +3,18 @@
     <div class="modal-content-wrapper">
       <div class="modal-header">
         <h5 class="modal-title">Have a question? Enter your details</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"> <i
-            class="ri-close-line"></i></button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()">
+          <i class="ri-close-line"></i>
+        </button>
       </div>
 
       <div class="modal-body">
-        <form (ngSubmit)="onSubmit()" class="form-container">
+        <form [formGroup]="enquiryForm" (ngSubmit)="onSubmit()" class="form-container">
           <div class="form-group">
             <label for="name">Given Name</label>
-            <input type="text" id="name" name="name" placeholder="Please enter your phone"
-              [(ngModel)]="enquiryForm.name" class="form-control" required>
+            <input type="text" id="name" formControlName="name" placeholder="Please enter your name"
+              [class.is-invalid]="isFieldInvalid('name')" class="form-control">
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">{{ getErrorMessage('name') }}</div>
           </div>
 
           <div class="form-group">
@@ -21,19 +23,22 @@
               <div class="country-code">
                 <span>+91</span>
               </div>
-              <input type="tel" id="phone" name="phone" placeholder="Please enter your phone"
-                [(ngModel)]="enquiryForm.phone" class="form-control" required>
+              <input type="tel" id="phone" formControlName="phone" placeholder="Please enter your phone"
+                [class.is-invalid]="isFieldInvalid('phone')" class="form-control">
             </div>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('phone')">{{ getErrorMessage('phone') }}</div>
           </div>
 
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" placeholder="Please enter your email"
-              [(ngModel)]="enquiryForm.email" class="form-control" required>
+            <input type="email" id="email" formControlName="email" placeholder="Please enter your email"
+              [class.is-invalid]="isFieldInvalid('email')" class="form-control">
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">{{ getErrorMessage('email') }}</div>
           </div>
 
-          <button type="submit" class="submit-button">
-            Request callback
+          <button type="submit" class="submit-button" [disabled]="isLoading">
+            <ng-container *ngIf="!isLoading">Request callback</ng-container>
+            <div *ngIf="isLoading" class="loader"></div>
           </button>
         </form>
       </div>

@@ -24,7 +24,7 @@
         </div>
 
         <div class="location-grid" *ngIf="filteredLocations.length > 0">
-          <div *ngFor="let location of filteredLocations.slice(0, 9); let i = index" class="location-card glass-effect"
+          <div *ngFor="let location of filteredLocations.slice(0, 6); let i = index" class="location-card glass-effect"
             [class.active]="i === selectedIndex" (click)="selectLocation(location)" (mouseenter)="selectedIndex = i"
             [@cardAnimation]>
             <div class="location-content">

@@ -1,6 +1,6 @@
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-whatsapp-button',
@@ -53,14 +53,18 @@ import { Component, Input } from '@angular/core';
     ])
   ]
 })
-export class WhatsappButtonComponent {
+export class WhatsappButtonComponent implements OnInit, OnDestroy {
   @Input() phoneNumber: string = '';
   isPulsing: boolean = false;
   isHovered: boolean = false;
   showTooltip: boolean = false;
   private pulseInterval: any;
 
-  ngOnInit() {
+  get sanitizedPhone(): string {
+    return this.phoneNumber.replace(/\D/g, '');
+  }
+
+  ngOnInit(): void {
     this.startPulseAnimation();
     // Show tooltip briefly on initial load
     setTimeout(() => {
@@ -71,7 +75,7 @@ export class WhatsappButtonComponent {
     }, 1500);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.pulseInterval) {
       clearInterval(this.pulseInterval);
     }

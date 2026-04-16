@@ -1,6 +1,7 @@
 <!-- tour-card.component.html -->
 <div class="package-card animate__animated animate__fadeInUp">
-    <div class="package-img" (click)="openEnquiryModal()">
+    <!-- M9: add role and aria-label so screen readers know this is interactive -->
+    <div class="package-img" role="button" aria-label="Enquire about this tour" (click)="openEnquiryModal()">
         <div class="gradient-overlay"></div>
         <swiper-container #swiperContainer init="false">
             @for (image of tour.images; track $index) {
@@ -62,13 +63,14 @@
                     </div>
                 </div>
                 <div class="info-container">
+                    <!-- L5: use standard triggers instead of manual toggle which can desync -->
                     <button class="info-btn" [ngbTooltip]="highlightsTemplate" tooltipClass="highlights-tooltip"
-                        [openDelay]="200" [closeDelay]="200" placement="auto" container="body" [autoClose]="true"
-                        triggers="manual" #t="ngbTooltip" (mouseenter)="t.toggle()" (mouseleave)="t.toggle()">
+                        [openDelay]="200" [closeDelay]="200" placement="auto" container="body"
+                        triggers="mouseenter:mouseleave">
                         Tour Highlights
                     </button>
                 </div>
-                
+
             </div>
             <p class="per-person-info">Per Person (Min. {{tour.minPersons}} Paying Pax Required)</p>
         </div>
@@ -86,7 +88,8 @@
 
 <ng-template #highlightsTemplate>
     <div class="highlights-content">
-        <ng-container *ngIf="tour.highlights.length; else noRecords">
+        <!-- M7: optional chaining to avoid TypeError when highlights is undefined -->
+        <ng-container *ngIf="tour.highlights?.length; else noRecords">
             @for (highlight of tour.highlights; track highlight) {
             <div class="highlight-item">
                 <i class="ri-check-line"></i>

@@ -13,8 +13,10 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   Input,
+  SimpleChanges,
   ViewChild,
   OnInit,
+  OnChanges,
   OnDestroy,
   inject,
 } from '@angular/core';
@@ -56,22 +58,30 @@ export interface TourPackage {
         animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' })),
       ]),
       transition(':leave', [
-        animate(
-          '200ms ease-in',
-          style({ opacity: 0, transform: 'scale(0.95)' })
-        ),
+        animate('200ms ease-in', style({ opacity: 0, transform: 'scale(0.95)' })),
+      ]),
+    ]),
+    trigger('errorAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-4px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [
+        animate('150ms ease-in', style({ opacity: 0, transform: 'translateY(-4px)' })),
       ]),
     ]),
   ],
 })
-export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BreadcrumbsComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;
   queryForm: FormGroup;
   private swiperEl: any;
-  userDeatils: UserDetails;
+  private swiperInitialized = false;
+  userDetails: UserDetails;
 
   @Input() packages: SliderTour[] = [];
   isLoading = false;
+  isSubmitted = false;
 
   formFields = [
     {
@@ -79,7 +89,7 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
       type: 'text',
       placeholder: 'Your Name',
       icon: 'ri-user-line',
-      validation: [Validators.required, Validators.minLength(3)],
+      validation: [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z\s]+$/)],
     },
     {
       name: 'email',
@@ -93,7 +103,7 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
       type: 'tel',
       placeholder: 'Contact Number',
       icon: 'ri-phone-line',
-      validation: [Validators.required, Validators.pattern('^[0-9]{10}$')],
+      validation: [Validators.required, Validators.pattern(/^[0-9]{8,}$/)],
     },
   ];
 
@@ -106,7 +116,7 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     private commonService: CommonService,
     private queryService: QueryService
   ) {
-    this.userDeatils = this.commonService.getUserDetails();
+    this.userDetails = this.commonService.getUserDetails();
     this.queryForm = this.initForm();
 
     this.routeSub = this.route.params.subscribe((params) => {
@@ -115,18 +125,25 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    if (!this.packages.length) {
-      console.warn('No packages loaded');
+  ngOnInit(): void {}
+
+  // C6: re-initialize Swiper when packages arrive (async input via async pipe)
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['packages'] && this.packages.length > 0 && !this.swiperInitialized && this.swiperContainer) {
+      this.initializeSwiper();
     }
   }
 
   ngAfterViewInit(): void {
-    this.initializeSwiper();
+    // If packages were already available synchronously, initialize now
+    if (this.packages.length > 0 && !this.swiperInitialized) {
+      this.initializeSwiper();
+    }
   }
 
   private initializeSwiper(): void {
-    if (!this.swiperContainer?.nativeElement) return;
+    if (!this.swiperContainer?.nativeElement || this.swiperInitialized) return;
+    this.swiperInitialized = true;
 
     this.swiperEl = this.swiperContainer.nativeElement;
 
@@ -199,20 +216,21 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
       const queryData = {
         ...this.queryForm.value,
         note: this.defaultMessages,
-        url: window.location.href,
+        url: window.location.origin + window.location.pathname,
       };
 
       this.queryService.sendQuery(queryData).subscribe({
         next: (response) => {
           if (response.success) {
+            this.isLoading = false;
+            this.isSubmitted = true;
             this.queryService.sendMail(queryData);
+            this.queryForm.reset();
+            this.queryForm.patchValue({ consent: true });
+            setTimeout(() => { this.isSubmitted = false; }, 5000);
           }
         },
-        error: (error) => {
-          console.error('Error submitting query:', error);
-          this.isLoading = false;
-        },
-        complete: () => {
+        error: () => {
           this.isLoading = false;
         },
       });
@@ -239,7 +257,9 @@ export class BreadcrumbsComponent implements OnInit, AfterViewInit, OnDestroy {
       return 'Please enter a valid email address';
     }
     if (control?.hasError('pattern')) {
-      return 'Please enter a valid 10-digit phone number';
+      if (fieldName === 'phone') return 'Phone number must contain only digits (min 8)';
+      if (fieldName === 'name') return 'Name can only contain letters and spaces';
+      return 'Invalid format';
     }
     if (control?.hasError('minlength')) {
       return `${this.getFieldLabel(fieldName)} is too short`;

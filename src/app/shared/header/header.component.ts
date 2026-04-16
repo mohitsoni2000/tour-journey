@@ -1,14 +1,15 @@
 // header.component.ts
 import {
   Component,
+  DestroyRef,
   ViewChild,
   ElementRef,
   HostListener,
   OnInit,
   OnDestroy,
-  Output,
-  EventEmitter,
+  inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, style, transition, animate } from '@angular/animations';
@@ -72,13 +73,15 @@ interface SearchModel {
   ],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  private destroyRef = inject(DestroyRef);
+
   isSticky = false;
   isSearchFormOpen = false;
   showAnnouncement = true;
   searchDestination = 'Dubai';
   cities: string[] = [];
   currentCityIndex = 0;
-  currentCity = this.cities[0];
+  currentCity = ''; // M6: initialize as empty string instead of undefined
   private cityInterval: any;
 
   isAnimatingIn: boolean = false;
@@ -98,55 +101,61 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   @ViewChild('searchInput') searchInput!: ElementRef;
   announcementText: string = '';
-  userDeatils: UserDetails;
+  userDetails: UserDetails;
   locations: any[] = [];
   constructor(
     private commonService: CommonService,
     private headerService: HeaderService,
     private modalService: NgbModal
   ) {
-    this.userDeatils = this.commonService.getUserDetails();
+    this.userDetails = this.commonService.getUserDetails();
   }
 
   ngOnInit(): void {
     this.startCityAnimation();
     this.fetchHeaderSettings();
-    this.headerService.fetchLocations().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.cities = response.data.map((item) => item.name);
-          this.currentCity = this.cities[0];
-          this.locations = response.data;
-        }
-      },
-    });
+    // H5: use takeUntilDestroyed to clean up subscription when component is destroyed
+    this.headerService.fetchLocations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.cities = response.data.map((item: any) => item.name);
+            this.currentCity = this.cities[0] || ''; // M6: safe fallback
+            this.locations = response.data;
+          }
+        },
+      });
   }
 
   private fetchHeaderSettings(): void {
-    this.headerService.fetchHeaderSettings().subscribe({
-      next: (response) => {
-        if (response.success) {
-          const headerData = response.data.find(
-            (item) => item.name === 'site_header'
-          );
-          const emailData = response.data.find(
-            (item) => item.name === 'admin_email'
-          );
+    // H5: use takeUntilDestroyed to clean up subscription when component is destroyed
+    this.headerService.fetchHeaderSettings()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            const headerData = response.data.find(
+              (item) => item.name === 'site_header'
+            );
+            const emailData = response.data.find(
+              (item) => item.name === 'admin_email'
+            );
 
-          if (headerData) {
-            this.announcementText = headerData.val;
+            if (headerData) {
+              this.announcementText = headerData.val;
+            }
+            if (emailData) {
+              this.userDetails.email = emailData.val;
+            }
           }
-          if (emailData) {
-            this.userDeatils.email = emailData.val;
-          }
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching announcement:', error);
-        this.announcementText =
-          "Journey bees won India's Best International Holiday Brand!"; // fallback
-      },
-    });
+        },
+        error: (error) => {
+          console.error('Error fetching announcement:', error);
+          this.announcementText =
+            "Journey bees won India's Best International Holiday Brand!";
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -198,14 +207,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private animateCity() {
-    // Start exit animation
+    if (!this.cities.length) return; // M6: guard against empty cities array
     this.isAnimatingOut = true;
     this.isAnimatingIn = false;
 
     setTimeout(() => {
-      // Update text
       this.currentIndex = (this.currentIndex + 1) % this.cities.length;
-      this.currentCity = this.cities[this.currentIndex];
+      this.currentCity = this.cities[this.currentIndex] || '';
 
       // Start entrance animation
       this.isAnimatingOut = false;

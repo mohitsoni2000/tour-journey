@@ -446,6 +446,47 @@ button[type="submit"]:disabled {
   margin-left: 10px;
 }
 
+/* Validation error message */
+.error-message {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 5px;
+  padding-left: 4px;
+  display: block;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Success state */
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: #fff;
+}
+
+.success-icon {
+  font-size: 56px;
+  color: #4caf50;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.success-state h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.success-state p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
 /* Loading spinner */
 .loader {
   width: 20px;

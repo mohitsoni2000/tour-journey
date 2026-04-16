@@ -20,15 +20,17 @@ export class TourResolver implements Resolve<any> {
 
     return this.tourService.getTourByName(tourName).pipe(
       catchError((error) => {
-        if (error.status === 404) {
+        // M3: TourService throws a plain Error (no .status) when response.success is false;
+        // HttpErrorResponse has .status — use ?. to handle both cases safely
+        if (error?.status === 404) {
           this.router.navigate(['/error'], {
             queryParams: { message: 'Tour not found', status: 404 },
           });
         } else {
           this.router.navigate(['/error'], {
             queryParams: {
-              message: 'An error occurred while loading the tour',
-              status: error.status,
+              message: error?.message || 'An error occurred while loading the tour',
+              status: error?.status || 500,
             },
           });
         }

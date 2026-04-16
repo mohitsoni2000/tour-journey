@@ -1,3 +1,33 @@
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  flex: 1;
+
+  .success-icon {
+    font-size: 64px;
+    color: #4caf50;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+
+  h3 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+  }
+
+  p {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.6;
+  }
+}
+
 :host {
   --modal-bg: #fff;
   --primary-color-dark: #015d52;
@@ -284,6 +314,18 @@
       flex: 1;
     }
   }
+}
+
+.field-error {
+  color: #e53e3e;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.phone-field-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .submit-button {

@@ -1,5 +1,5 @@
 // footer.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import {
@@ -7,13 +7,8 @@ import {
   UserDetails,
 } from '../../service/common/common.service';
 import { FooterService } from '../../service/footer/footer.service';
-import {
-  ActivatedRoute,
-  NavigationEnd,
-  Router,
-  RouterModule,
-} from '@angular/router';
-import { filter, finalize } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+import { finalize } from 'rxjs';
 import { HeaderService } from '../../service/header/header.service';
 
 interface FooterSection {
@@ -55,7 +50,7 @@ interface Destination {
     ]),
   ],
 })
-export class FooterComponent implements OnInit {
+export class FooterComponent implements OnInit, OnDestroy {
   currentYear = new Date().getFullYear();
 
   socialLinks: SocialLink[];
@@ -99,30 +94,30 @@ export class FooterComponent implements OnInit {
   internationalDestinations: string[] = [];
   isLoading = true;
 
-  userDeatils: UserDetails;
+  userDetails: UserDetails;
+  private animationObserver: IntersectionObserver | null = null;
 
   constructor(
     private commonService: CommonService,
     private footerService: FooterService,
     private headerService: HeaderService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
-    this.userDeatils = this.commonService.getUserDetails();
+    this.userDetails = this.commonService.getUserDetails();
     this.socialLinks = [
       {
         icon: 'ri-facebook-fill',
-        url: this.userDeatils.facebook,
+        url: this.userDetails.facebook,
         label: 'Facebook',
       },
       {
         icon: 'ri-instagram-fill',
-        url: this.userDeatils.instagram,
+        url: this.userDetails.instagram,
         label: 'Instagram',
       },
       {
         icon: 'ri-twitter-fill',
-        url: this.userDeatils.twitter,
+        url: this.userDetails.twitter,
         label: 'Twitter',
       },
     ];
@@ -166,10 +161,9 @@ export class FooterComponent implements OnInit {
   }
 
   private initializeAnimations() {
-    // Add animate.css classes to elements
     const animatedElements = document.querySelectorAll('.animate-on-scroll');
-
-    const observer = new IntersectionObserver(
+    // H13: store observer reference so it can be disconnected on destroy
+    this.animationObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -183,23 +177,18 @@ export class FooterComponent implements OnInit {
       { threshold: 0.1 }
     );
 
-    animatedElements.forEach((el) => observer.observe(el));
+    animatedElements.forEach((el) => this.animationObserver!.observe(el));
   }
 
+  // H2: navigate().then() fires on completion — no router.events subscription needed
   selectDestination(destination: Destination) {
-    // Navigate to new route
-    this.router
-      .navigate(['/tour', destination.url], {
-        skipLocationChange: false,
-        replaceUrl: false,
-      })
-      .then(() => {
-        // Force route refresh by subscribing to NavigationEnd
-        this.router.events
-          .pipe(filter((event) => event instanceof NavigationEnd))
-          .subscribe(() => {
-            window.scrollTo(0, 0); // Scroll to top after navigation
-          });
-      });
+    this.router.navigate(['/tour', destination.url]).then(() => {
+      window.scrollTo(0, 0);
+    });
+  }
+
+  ngOnDestroy() {
+    // H13: disconnect observer to release DOM references
+    this.animationObserver?.disconnect();
   }
 }

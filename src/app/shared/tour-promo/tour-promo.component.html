@@ -35,14 +35,26 @@
                     <i class="ri-close-line"></i>
                 </button>
 
+                <ng-container *ngIf="isSubmitted; else formTemplate">
+                    <div class="success-state">
+                        <div class="success-icon">
+                            <i class="ri-checkbox-circle-fill"></i>
+                        </div>
+                        <h3>Thank You!</h3>
+                        <p>Our travel expert will call you back shortly.</p>
+                    </div>
+                </ng-container>
+
+                <ng-template #formTemplate>
                 <div class="form-header">
                     <h4>Have a question? Enter your details</h4>
                 </div>
 
-                <form (ngSubmit)="onSubmit()" class="contact-form">
+                <form [formGroup]="enquiryForm" (ngSubmit)="onSubmit()" class="contact-form">
                     <div class="form-group" style="--index: 0">
-                        <input type="text" placeholder="Given Name" [(ngModel)]="enquiryForm.name" name="name"
-                            [class.invalid]="submitted && !enquiryForm.name" required>
+                        <input type="text" placeholder="Given Name" formControlName="name"
+                            [class.invalid]="isFieldInvalid('name')">
+                        <div class="field-error" *ngIf="isFieldInvalid('name')">{{ getErrorMessage('name') }}</div>
                     </div>
 
                     <div class="form-group phone-group" style="--index: 1">
@@ -50,13 +62,17 @@
                             <span>+91</span>
                             <i class="ri-arrow-down-s-line"></i>
                         </div>
-                        <input type="tel" placeholder="Enter your mobile number" [(ngModel)]="enquiryForm.phone"
-                            name="phone" [class.invalid]="submitted && !enquiryForm.phone" required>
+                        <div class="phone-field-wrapper">
+                            <input type="tel" placeholder="Enter your mobile number" formControlName="phone"
+                                [class.invalid]="isFieldInvalid('phone')">
+                            <div class="field-error" *ngIf="isFieldInvalid('phone')">{{ getErrorMessage('phone') }}</div>
+                        </div>
                     </div>
 
                     <div class="form-group" style="--index: 2">
-                        <input type="email" placeholder="Email Address" [(ngModel)]="enquiryForm.email" name="email"
-                            [class.invalid]="submitted && !enquiryForm.email" required>
+                        <input type="email" placeholder="Email Address" formControlName="email"
+                            [class.invalid]="isFieldInvalid('email')">
+                        <div class="field-error" *ngIf="isFieldInvalid('email')">{{ getErrorMessage('email') }}</div>
                     </div>
 
                     <button type="submit" class="submit-button" [disabled]="isLoading">
@@ -68,6 +84,7 @@
                         </ng-container>
                     </button>
                 </form>
+                </ng-template>
             </div>
         </div>
     </div>

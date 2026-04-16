@@ -1,6 +1,6 @@
 <div class="whatsapp-container" [@buttonContainer]="'in'" (mouseenter)="showTooltip = true"
   (mouseleave)="showTooltip = false">
-  <a [href]="'https://wa.me/' + phoneNumber" class="whatsapp-button" target="_blank"
+  <a [href]="'https://wa.me/' + sanitizedPhone" class="whatsapp-button" target="_blank"
     [@pulseAnimation]="isPulsing ? 'pulse' : 'noPulse'" [@scaleHover]="isHovered ? 'hovered' : 'default'"
     (mouseenter)="onHover(true)" (mouseleave)="onHover(false)">
     <i class="ri-whatsapp-line" [@iconAnimation]="isHovered ? 'hovered' : 'default'"></i>

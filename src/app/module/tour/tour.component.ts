@@ -77,6 +77,16 @@ import { TourPromoComponent } from '../../shared/tour-promo/tour-promo.component
         animate('800ms ease-out', style({ transform: 'scale(1)', opacity: 1 })),
       ]),
     ]),
+    // C5: add missing fadeInOut animation used by the scroll-to-top button
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [
+        animate('150ms ease-in', style({ opacity: 0, transform: 'translateY(10px)' })),
+      ]),
+    ]),
   ],
 })
 export class TourComponent implements OnDestroy {

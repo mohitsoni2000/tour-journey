@@ -2,6 +2,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
 import { TransformedTour } from '../tour/tour.service';
 
 @Injectable({
@@ -11,6 +12,7 @@ export class SeoService {
   private meta = inject(Meta);
   private title = inject(Title);
   private router = inject(Router);
+  private doc = inject(DOCUMENT);
 
   private readonly siteName = 'JourneyBees';
   private readonly defaultImage = 'assets/images/default-og-image.jpg';
@@ -36,11 +38,8 @@ export class SeoService {
     const keywords = this.generateTourKeywords(tour);
     this.meta.updateTag({ name: 'keywords', content: keywords });
 
-    // Set canonical URL
-    this.meta.updateTag({ 
-      rel: 'canonical', 
-      href: `${window.location.origin}${this.router.url}` 
-    });
+    // M1: canonical URL must be a <link> element, not a <meta> tag
+    this.updateCanonical(`${this.doc.location.origin}${this.router.url}`);
 
     // Set language
     this.meta.updateTag({ 
@@ -60,7 +59,7 @@ export class SeoService {
     const ogTags = [
       { property: 'og:title', content: this.generateTourTitle(tour) },
       { property: 'og:description', content: description },
-      { property: 'og:url', content: `${window.location.origin}${this.router.url}` },
+      { property: 'og:url', content: `${this.doc.location.origin}${this.router.url}` },
       { property: 'og:type', content: 'website' },
       { property: 'og:image', content: tour.images[0] || this.defaultImage },
       { property: 'og:image:alt', content: `${tour.title} Tour Package` },
@@ -101,7 +100,7 @@ export class SeoService {
       provider: {
         '@type': 'Organization',
         name: this.siteName,
-        url: window.location.origin
+        url: this.doc.location.origin
       },
       offers: {
         '@type': 'Offer',
@@ -144,17 +143,16 @@ export class SeoService {
       ]
     };
 
-    // Remove existing schema
-    const existingSchema = document.querySelector('script[type="application/ld+json"]');
+    // M2: use injected DOCUMENT instead of global document (SSR-compatible)
+    const existingSchema = this.doc.querySelector('script[type="application/ld+json"]');
     if (existingSchema) {
       existingSchema.remove();
     }
 
-    // Add new schema
-    const script = document.createElement('script');
+    const script = this.doc.createElement('script');
     script.type = 'application/ld+json';
     script.text = JSON.stringify(schema);
-    document.head.appendChild(script);
+    this.doc.head.appendChild(script);
   }
 
   private generateTourTitle(tour: TransformedTour): string {
@@ -205,9 +203,20 @@ export class SeoService {
     this.meta.removeTag('name="twitter:image"');
 
     // Remove structured data
-    const existingSchema = document.querySelector('script[type="application/ld+json"]');
+    const existingSchema = this.doc.querySelector('script[type="application/ld+json"]');
     if (existingSchema) {
       existingSchema.remove();
     }
+  }
+
+  // M1: proper canonical <link> tag management (not a <meta> tag)
+  private updateCanonical(url: string): void {
+    let link = this.doc.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!link) {
+      link = this.doc.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      this.doc.head.appendChild(link);
+    }
+    link.setAttribute('href', url);
   }
 }

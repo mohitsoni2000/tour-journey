@@ -4,16 +4,6 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="faq-container" [@listAnimation]="faqs.length">
-                    @if (isLoading) {
-                    @for (item of [1,2,3]; track item) {
-                    <div class="faq-item mb-3 skeleton-item">
-                        <div class="faq-header skeleton">
-                            <div class="skeleton-question"></div>
-                            <div class="skeleton-icon"></div>
-                        </div>
-                    </div>
-                    }
-                    } @else {
                     @for (faq of faqs; track faq.question) {
                     <div class="faq-item mb-3" [class.active]="faq.isOpen"
                         [@expansionAnimation]="faq.isOpen ? 'expanded' : 'collapsed'">
@@ -25,7 +15,6 @@
                             <div class="faq-answer">{{ faq.answer }}</div>
                         </div>
                     </div>
-                    }
                     }
                 </div>
             </div>

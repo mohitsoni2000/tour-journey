@@ -43,13 +43,13 @@ export class HeaderService {
         tap(() => {
           this.lastCacheTime = Date.now();
         }),
-        shareReplay(1),
+        // H8: finalize must be BEFORE shareReplay so it fires once when the HTTP source
+        // completes, not on each subscriber teardown
         finalize(() => {
-          // Store the completed request in the cache
           this.cachedResponse = this.inFlightRequest;
-          // Clear the in-flight request
           this.inFlightRequest = null;
-        })
+        }),
+        shareReplay(1)
       );
 
     return this.inFlightRequest;

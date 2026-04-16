@@ -38,6 +38,17 @@
 
     <div class="query-form-wrapper">
         <div class="glass-form">
+            <ng-container *ngIf="isSubmitted; else formTemplate">
+                <div class="success-state">
+                    <div class="success-icon">
+                        <i class="ri-checkbox-circle-fill"></i>
+                    </div>
+                    <h3>Thank You!</h3>
+                    <p>Our travel expert will call you back shortly.</p>
+                </div>
+            </ng-container>
+
+            <ng-template #formTemplate>
             <div class="form-header">
                 <i class="ri-customer-service-2-line"></i>
                 <h3>Get a Callback</h3>
@@ -70,12 +81,12 @@
                 </div>
 
                 <div class="action-buttons">
-                    <a [href]="'tel:' + userDeatils.phone" class="call-btn">
+                    <a [href]="'tel:' + userDetails.phone" class="call-btn">
                         <i class="ri-phone-line"></i>
                     </a>
                     <button type="submit" [disabled]="queryForm.invalid || isLoading" class="submit-button">
                         <ng-container *ngIf="!isLoading; else loadingTemplate">
-                            Submit Query
+                            Get a Callback
                         </ng-container>
                         <ng-template #loadingTemplate>
                             <div class="loader"></div>
@@ -83,6 +94,7 @@
                     </button>
                 </div>
             </form>
+            </ng-template>
         </div>
     </div>
 </section>

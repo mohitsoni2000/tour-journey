@@ -147,7 +147,11 @@ export class TourService {
       ? tour.gallery.split(',').filter(Boolean)
       : [];
 
-    const imageUrls = [`${this.apiUrl}/uploads/${tour.image_file_path}`];
+    // M4: include gallery images instead of only the primary image
+    const imageUrls = [
+      `${this.apiUrl}/uploads/${tour.image_file_path}`,
+      ...galleryArray.map((img) => `${this.apiUrl}/uploads/${img.trim()}`),
+    ];
 
     let includes = {};
     let excludes = {};
@@ -217,7 +221,10 @@ export class TourService {
 
   convertDuration(duration: number): string {
     const days = Math.floor(duration / 24);
-    const nights = duration % 24 >= 12 ? days : days - 1;
-    return `${days} Days, ${nights} Nights`;
+    // M5: clamp nights to 0 (prevents negative nights for short durations)
+    const nights = Math.max(0, duration % 24 >= 12 ? days : days - 1);
+    const dayLabel = days === 1 ? 'Day' : 'Days';
+    const nightLabel = nights === 1 ? 'Night' : 'Nights';
+    return `${days} ${dayLabel}, ${nights} ${nightLabel}`;
   }
 }

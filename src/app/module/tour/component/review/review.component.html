@@ -71,13 +71,13 @@
 
     <!-- Reviews List -->
     <div class="reviews-list mt-4">
-        <div *ngFor="let review of reviews" class="review-card glass-card animate-slide-in">
+        <div *ngFor="let review of reviews; trackBy: trackByReviewId" class="review-card glass-card animate-slide-in">
             <div class="review-header">
                 <div class="user-info">
                     <div class="avatar">
                         <img *ngIf="review.profilePhoto" [src]="review.profilePhoto" [alt]="review.userName">
                         <span *ngIf="!review.profilePhoto">
-                            {{review.userName[0]}}
+                            {{review.userName[0] || '?'}}
                         </span>
                     </div>
                     <div class="user-details">

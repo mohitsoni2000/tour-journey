@@ -1,16 +1,18 @@
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QueryService } from '../../service/query/query.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { APIResponse } from '../../service/tour-package/tour-package.service';
 
 @Component({
   selector: 'app-tour-promo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './tour-promo.component.html',
   styleUrl: './tour-promo.component.scss',
   animations: [
@@ -28,41 +30,35 @@ import { Subscription } from 'rxjs';
     ]),
   ],
 })
-export class TourPromoComponent implements OnInit {
-  enquiryForm = {
-    name: '',
-    email: '',
-    phone: '',
-    destination: '',
-    note: 'Enquiry from website',
-    url: window.location.href,
-    consent: true,
-  };
+export class TourPromoComponent implements OnInit, OnDestroy {
+  private modalService = inject(NgbModal);
+  private queryService = inject(QueryService);
+  private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
-  clearForm() {
-    this.enquiryForm = {
-      name: '',
-      email: '',
-      phone: '',
-      destination: '',
-      note: 'Enquiry from website',
-      url: window.location.href,
-      consent: true,
-    };
-  }
+  enquiryForm = this.fb.group({
+    name: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.pattern(/^[a-zA-Z\s]+$/),
+      ],
+    ],
+    phone: ['', [Validators.required, Validators.pattern(/^[0-9]{8,}$/)]],
+    email: ['', [Validators.required, Validators.email]],
+    destination: [''],
+  });
 
   @ViewChild('promoModal') promoModal: any;
   private modalDisplayInterval: any;
+  private modalInitTimeout: any; // H4: store timeout ID so it can be cleared
   isLoading = false;
-  submitted = false;
+  isSubmitted = false;
   private isModalOpen = false;
-  private route = inject(ActivatedRoute);
   private routeSub: Subscription | undefined;
   private defaultMessages = 'Enquiry from website';
-  constructor(
-    private modalService: NgbModal,
-    private queryService: QueryService
-  ) {}
 
   ngOnInit() {
     this.startModalInterval();
@@ -75,77 +71,122 @@ export class TourPromoComponent implements OnInit {
 
   ngOnDestroy() {
     this.stopModalInterval();
+    this.routeSub?.unsubscribe(); // H3: unsubscribe route subscription
   }
 
   private startModalInterval() {
-    // Show first modal after 1 minute
-    setTimeout(() => {
+    // H4: store the timeout ID so it can be cleared on destroy
+    this.modalInitTimeout = setTimeout(() => {
       this.openPromoModal();
-
-      // Then show every 5 minutes
       this.modalDisplayInterval = setInterval(() => {
         if (!this.isModalOpen) {
           this.openPromoModal();
         }
-      }, 1 * 60 * 1000); // 1 minutes
+      }, 1 * 60 * 1000);
     }, 1 * 60 * 1000); // 1 minute
   }
 
   private stopModalInterval() {
+    // H4: clear both the initial timeout and the recurring interval
+    if (this.modalInitTimeout) {
+      clearTimeout(this.modalInitTimeout);
+      this.modalInitTimeout = null;
+    }
     if (this.modalDisplayInterval) {
       clearInterval(this.modalDisplayInterval);
+      this.modalDisplayInterval = null;
     }
   }
 
   openPromoModal(message?: string) {
     if (!this.isModalOpen) {
       this.isModalOpen = true;
-      this.enquiryForm.note = message || this.defaultMessages;
+      this.enquiryForm.patchValue({ destination: message || '' });
       const modalRef = this.modalService.open(this.promoModal, {
         centered: true,
         backdrop: 'static',
         windowClass: 'animated-modal',
-        size: 'xl'
+        size: 'xl',
       });
 
       modalRef.result.finally(() => {
         this.isModalOpen = false;
-        this.enquiryForm.note = 'Enquiry from website';
+        this.isSubmitted = false;
+        this.enquiryForm.reset();
       });
     }
+  }
+
+  isFieldInvalid(field: string): boolean {
+    const control = this.enquiryForm.get(field);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  getErrorMessage(field: string): string {
+    const control = this.enquiryForm.get(field);
+    if (!control) return '';
+    if (control.hasError('required'))
+      return `${this.getLabel(field)} is required`;
+    if (control.hasError('minlength')) {
+      const min = control.errors?.['minlength']?.requiredLength;
+      return `${this.getLabel(field)} must be at least ${min} characters`;
+    }
+    if (control.hasError('pattern')) {
+      if (field === 'phone')
+        return 'Phone number must contain only digits (min 8)';
+      if (field === 'name') return 'Name can only contain letters and spaces';
+    }
+    if (control.hasError('email')) return 'Please enter a valid email address';
+    return 'Invalid input';
+  }
+
+  private getLabel(field: string): string {
+    const labels: Record<string, string> = {
+      name: 'Name',
+      phone: 'Phone number',
+      email: 'Email',
+      destination: 'Destination',
+    };
+    return labels[field] || field;
   }
 
   onSubmit() {
-    this.submitted = true;
+    if (this.enquiryForm.invalid) {
+      this.enquiryForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
 
-    if (this.isFormValid()) {
-      this.isLoading = true;
+    // M10: capture URL at submit time, not at component init
+    const queryData = {
+      name: this.enquiryForm.value.name ?? '',
+      phone: this.enquiryForm.value.phone ?? '',
+      email: this.enquiryForm.value.email ?? '',
+      note: this.defaultMessages,
+      url: window.location.origin + window.location.pathname,
+      consent: true as const,
+    };
 
-      
-      this.queryService.sendQuery(this.enquiryForm).subscribe({
-        next: (response) => {
+    this.queryService
+      .sendQuery(queryData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: APIResponse) => {
           if (response.success) {
-            this.submitted = false;
             this.isLoading = false;
-            this.modalService.dismissAll();
-            this.clearForm();
-            this.queryService.sendMail(this.enquiryForm);
+            this.isSubmitted = true;
+            this.queryService.sendMail(queryData);
+            setTimeout(() => {
+              this.isSubmitted = false;
+              this.modalService.dismissAll();
+            }, 3000);
+          } else {
+            this.isLoading = false;
           }
         },
-        error: (error) => {
-          console.error('Error submitting enquiry:', error);
+        error: () => {
           this.isLoading = false;
         },
       });
-    }
-  }
-
-  private isFormValid(): boolean {
-    return !!(
-      this.enquiryForm.name &&
-      this.enquiryForm.email &&
-      this.enquiryForm.phone &&
-      this.enquiryForm.consent
-    );
   }
 }

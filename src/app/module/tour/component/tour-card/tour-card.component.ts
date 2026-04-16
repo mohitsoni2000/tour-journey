@@ -121,17 +121,18 @@ export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private initializeSwiper() {
     const swiperEl = this.swiperContainer.nativeElement;
+    // C4: scope navigation and pagination to this specific instance using querySelector
     const swiperParams = {
       slidesPerView: 1,
       speed: 500,
       loop: true,
       effect: 'fade',
       navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
+        nextEl: swiperEl.querySelector('.swiper-button-next'),
+        prevEl: swiperEl.querySelector('.swiper-button-prev'),
       },
       pagination: {
-        el: '.swiper-pagination',
+        el: swiperEl.querySelector('.swiper-pagination'),
         clickable: true,
         dynamicBullets: true,
       },
@@ -209,14 +210,14 @@ export class TourCardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.enquiryModalVisibleChange.emit(message);
   }
 
-  // Update the HostListener for document clicks
+  // C3: only reset showAllCities when clicking outside this component
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.tooltip?.close();
       this.citiesListTooltip?.close();
+      this.showAllCities = false;
     }
-    this.showAllCities = false;
   }
 
   // Add this to ngOnDestroy

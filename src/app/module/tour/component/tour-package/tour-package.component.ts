@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { APIResponse, TourPackageService } from '../../../../service/tour-package/tour-package.service';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tour-package',
@@ -11,11 +12,13 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './tour-package.component.html',
   styleUrl: './tour-package.component.scss',
 })
-export class TourPackageComponent {
+export class TourPackageComponent implements OnInit, OnDestroy {
   showModal = false;
   isLoading = true;
   location: any | null = null;
   error: string | null = null;
+
+  private routeSub: Subscription | undefined;
 
   constructor(
     private tourPackageService: TourPackageService,
@@ -23,7 +26,8 @@ export class TourPackageComponent {
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe((params) => {
+    // H7: store subscription for cleanup
+    this.routeSub = this.route.params.subscribe((params) => {
       const tourName = params['name'];
       if (tourName) {
         this.loadTourPackage(tourName);
@@ -41,7 +45,7 @@ export class TourPackageComponent {
         }
         this.isLoading = false;
       },
-      error: (error) => {
+      error: () => {
         this.error = 'Failed to load tour package details';
         this.isLoading = false;
       },
@@ -50,10 +54,18 @@ export class TourPackageComponent {
 
   openModal(): void {
     this.showModal = true;
+    document.body.style.overflow = 'hidden'; // H12: lock background scroll
   }
 
   closeModal(): void {
     this.showModal = false;
+    document.body.style.overflow = ''; // H12: restore scroll
+  }
+
+  // H12: close modal on Escape key
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.showModal) this.closeModal();
   }
 
   getFirstLine(htmlContent: string): string {
@@ -62,5 +74,10 @@ export class TourPackageComponent {
     const text = div.textContent || '';
     const firstLine = text.split('.')[0] + '...';
     return firstLine;
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
+    if (this.showModal) document.body.style.overflow = ''; // cleanup if destroyed while open
   }
 }

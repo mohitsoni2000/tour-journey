@@ -192,6 +192,10 @@ export class ReviewComponent implements OnInit, OnDestroy {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
+  trackByReviewId(_index: number, review: Review): string | number {
+    return review.id ?? _index;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
