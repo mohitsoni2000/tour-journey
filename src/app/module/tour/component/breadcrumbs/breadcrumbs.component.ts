@@ -81,7 +81,7 @@ export class BreadcrumbsComponent implements OnInit, OnChanges, AfterViewInit, O
 
   @Input() packages: SliderTour[] = [];
   isLoading = false;
-  isSubmitted = false;
+
 
   formFields = [
     {
@@ -223,11 +223,8 @@ export class BreadcrumbsComponent implements OnInit, OnChanges, AfterViewInit, O
         next: (response) => {
           if (response.success) {
             this.isLoading = false;
-            this.isSubmitted = true;
             this.queryService.sendMail(queryData);
-            this.queryForm.reset();
-            this.queryForm.patchValue({ consent: true });
-            setTimeout(() => { this.isSubmitted = false; }, 5000);
+            window.location.href = 'https://journeybees.in/page/thank-you';
           }
         },
         error: () => {

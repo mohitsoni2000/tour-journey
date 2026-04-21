@@ -35,17 +35,6 @@
                     <i class="ri-close-line"></i>
                 </button>
 
-                <ng-container *ngIf="isSubmitted; else formTemplate">
-                    <div class="success-state">
-                        <div class="success-icon">
-                            <i class="ri-checkbox-circle-fill"></i>
-                        </div>
-                        <h3>Thank You!</h3>
-                        <p>Our travel expert will call you back shortly.</p>
-                    </div>
-                </ng-container>
-
-                <ng-template #formTemplate>
                 <div class="form-header">
                     <h4>Have a question? Enter your details</h4>
                 </div>
@@ -84,7 +73,6 @@
                         </ng-container>
                     </button>
                 </form>
-                </ng-template>
             </div>
         </div>
     </div>

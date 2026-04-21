@@ -11,7 +11,6 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   HostListener,
   inject,
@@ -41,16 +40,6 @@ import { Subscription } from 'rxjs';
       <div class="glass-overlay" [@overlayReveal]="animationState">
         <div class="query-form-wrapper" [@formEntry]="formFields.length">
           <div class="glass-form">
-            <ng-container *ngIf="isSubmitted; else bannerFormTemplate">
-              <div class="success-state">
-                <div class="success-icon">
-                  <i class="ri-checkbox-circle-fill"></i>
-                </div>
-                <h3>Thank You!</h3>
-                <p>Our travel expert will call you back shortly.</p>
-              </div>
-            </ng-container>
-            <ng-template #bannerFormTemplate>
             <form
               [formGroup]="queryForm"
               (ngSubmit)="onSubmit()"
@@ -135,7 +124,6 @@ import { Subscription } from 'rxjs';
                 </button>
               </div>
             </form>
-            </ng-template>
           </div>
         </div>
       </div>
@@ -324,7 +312,7 @@ import { Subscription } from 'rxjs';
   ],
 })
 export class BannerComponent implements OnDestroy {
-  private cdr = inject(ChangeDetectorRef);
+
   @Input() backgroundImage: string = 'assets/images/package/package-4.webp';
   @Input() title: string = 'Get a Callback';
   @Input() subtitle: string =
@@ -334,7 +322,6 @@ export class BannerComponent implements OnDestroy {
   animationState = 'default';
   buttonState = 'default';
   isLoading = false;
-  isSubmitted = false;
   onInputFocus() {
     this.animationState = 'focus';
   }
@@ -453,20 +440,12 @@ export class BannerComponent implements OnDestroy {
         next: (response) => {
           if (response.success) {
             this.isLoading = false;
-            this.isSubmitted = true;
-            this.cdr.markForCheck();
             this.queryService.sendMail(queryData);
-            this.queryForm.reset();
-            this.queryForm.patchValue({ consent: true });
-            setTimeout(() => {
-              this.isSubmitted = false;
-              this.cdr.markForCheck();
-            }, 5000);
+            window.location.href = 'https://journeybees.in/page/thank-you';
           }
         },
         error: () => {
           this.isLoading = false;
-          this.cdr.markForCheck();
         },
       });
     } else {

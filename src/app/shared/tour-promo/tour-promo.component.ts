@@ -55,7 +55,6 @@ export class TourPromoComponent implements OnInit, OnDestroy {
   private modalDisplayInterval: any;
   private modalInitTimeout: any; // H4: store timeout ID so it can be cleared
   isLoading = false;
-  isSubmitted = false;
   private isModalOpen = false;
   private routeSub: Subscription | undefined;
   private defaultMessages = 'Enquiry from website';
@@ -111,7 +110,6 @@ export class TourPromoComponent implements OnInit, OnDestroy {
 
       modalRef.result.finally(() => {
         this.isModalOpen = false;
-        this.isSubmitted = false;
         this.enquiryForm.reset();
       });
     }
@@ -174,12 +172,9 @@ export class TourPromoComponent implements OnInit, OnDestroy {
         next: (response: APIResponse) => {
           if (response.success) {
             this.isLoading = false;
-            this.isSubmitted = true;
             this.queryService.sendMail(queryData);
-            setTimeout(() => {
-              this.isSubmitted = false;
-              this.modalService.dismissAll();
-            }, 3000);
+            this.modalService.dismissAll();
+            window.location.href = 'https://journeybees.in/page/thank-you';
           } else {
             this.isLoading = false;
           }
