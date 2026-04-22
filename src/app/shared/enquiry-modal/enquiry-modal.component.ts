@@ -112,7 +112,7 @@ export class EnquiryModalComponent {
           if (response.success) {
             this.queryService.sendMail(queryData);
             this.modalService.dismissAll();
-            this.enquiryForm.reset();
+            window.location.href = 'https://journeybees.in/page/thank-you';
           }
           this.isLoading = false;
         },
